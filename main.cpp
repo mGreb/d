@@ -11,59 +11,59 @@
 using std::cout;
 using std::endl;
 
-const int A = 1;  // коэффициент при правой части
+const int A = 1;  // РєРѕСЌС„С„РёС†РёРµРЅС‚ РїСЂРё РїСЂР°РІРѕР№ С‡Р°СЃС‚Рё
 
-const int C = 0;  // левый край отрезка по x
-const int D = 1;  // правый край отрезка по x
+const int C = 0;  // Р»РµРІС‹Р№ РєСЂР°Р№ РѕС‚СЂРµР·РєР° РїРѕ x
+const int D = 1;  // РїСЂР°РІС‹Р№ РєСЂР°Р№ РѕС‚СЂРµР·РєР° РїРѕ x
 
-const int T1 = 0;  // начальное время t
-const int T2 = 1;  // конечное время t
+const int T1 = 0;  // РЅР°С‡Р°Р»СЊРЅРѕРµ РІСЂРµРјСЏ t
+const int T2 = 1;  // РєРѕРЅРµС‡РЅРѕРµ РІСЂРµРјСЏ t
 
-int n = 0;  // номер слоя по времени
+int n = 0;  // РЅРѕРјРµСЂ СЃР»РѕСЏ РїРѕ РІСЂРµРјРµРЅРё
 
-const bool flag = false;  // Выбор задачи(false - основная задача, true - задача на разрывную функцию)
+const bool flag = false;  // Р’С‹Р±РѕСЂ Р·Р°РґР°С‡Рё(false - РѕСЃРЅРѕРІРЅР°СЏ Р·Р°РґР°С‡Р°, true - Р·Р°РґР°С‡Р° РЅР° СЂР°Р·СЂС‹РІРЅСѓСЋ С„СѓРЅРєС†РёСЋ)
 
-const double alpha = 0.9;  // задайте альфа на полуинтервале (0;1]
-const double dx = 0.1;  // шаг по х
+const double alpha = 0.9;  // Р·Р°РґР°Р№С‚Рµ Р°Р»СЊС„Р° РЅР° РїРѕР»СѓРёРЅС‚РµСЂРІР°Р»Рµ (0;1]
+const double dx = 0.1;  // С€Р°Рі РїРѕ С…
 const double dt = 0.1 * pow(dx, 3.0 / alpha) / A;
-const double s = 0.1;  // самая первая ступенька (тесная зависимость с alpha, по какой формуле?)
+const double s = 0.1;  // СЃР°РјР°СЏ РїРµСЂРІР°СЏ СЃС‚СѓРїРµРЅСЊРєР° (С‚РµСЃРЅР°СЏ Р·Р°РІРёСЃРёРјРѕСЃС‚СЊ СЃ alpha, РїРѕ РєР°РєРѕР№ С„РѕСЂРјСѓР»Рµ?)
 
-const int stepAmountX = int((D - C) / dx + 1);  // кол-во узлов сеточной функции
-const int stepAmountT = int((T2 - T1) / dt);  // полные временные слои
-const int myStep = stepAmountT;  // 1000;  // число временных слоев необходимых для вычисления
-const int dodo = 2;  // заглушка для явной схемы, показывающая с КАКОГО временного слоя начинать неявную схему
+const int stepAmountX = int((D - C) / dx + 1);  // РєРѕР»-РІРѕ СѓР·Р»РѕРІ СЃРµС‚РѕС‡РЅРѕР№ С„СѓРЅРєС†РёРё
+const int stepAmountT = int((T2 - T1) / dt);  // РїРѕР»РЅС‹Рµ РІСЂРµРјРµРЅРЅС‹Рµ СЃР»РѕРё
+const int myStep = stepAmountT;  // 1000;  // С‡РёСЃР»Рѕ РІСЂРµРјРµРЅРЅС‹С… СЃР»РѕРµРІ РЅРµРѕР±С…РѕРґРёРјС‹С… РґР»СЏ РІС‹С‡РёСЃР»РµРЅРёСЏ
+const int dodo = 2;  // Р·Р°РіР»СѓС€РєР° РґР»СЏ СЏРІРЅРѕР№ СЃС…РµРјС‹, РїРѕРєР°Р·С‹РІР°СЋС‰Р°СЏ СЃ РљРђРљРћР“Рћ РІСЂРµРјРµРЅРЅРѕРіРѕ СЃР»РѕСЏ РЅР°С‡РёРЅР°С‚СЊ РЅРµСЏРІРЅСѓСЋ СЃС…РµРјСѓ
 
 const int threadNum = 1;  // number of threads for openmp
 
-// массивы для прогонки ------------------------------------------------------------------------------------------------
+// РјР°СЃСЃРёРІС‹ РґР»СЏ РїСЂРѕРіРѕРЅРєРё ------------------------------------------------------------------------------------------------
 double *fiveUp = (double*)calloc((size_t)stepAmountX, sizeof(double));
 double *fiveDown = (double*)calloc((size_t)stepAmountX, sizeof(double));
 
-double *A1 = (double*)calloc((size_t)stepAmountX, sizeof(double));  // поддиагональ
-double *B1 = (double*)calloc((size_t)stepAmountX, sizeof(double));  // диагональ
-double *C1 = (double*)calloc((size_t)stepAmountX, sizeof(double));  // наддиагональ
-double *D1 = (double*)calloc((size_t)stepAmountX, sizeof(double));  // здесь правая часть системы
-double *X  = (double*)calloc((size_t)stepAmountX, sizeof(double));  // метод прогонки записывает решение
+double *A1 = (double*)calloc((size_t)stepAmountX, sizeof(double));  // РїРѕРґРґРёР°РіРѕРЅР°Р»СЊ
+double *B1 = (double*)calloc((size_t)stepAmountX, sizeof(double));  // РґРёР°РіРѕРЅР°Р»СЊ
+double *C1 = (double*)calloc((size_t)stepAmountX, sizeof(double));  // РЅР°РґРґРёР°РіРѕРЅР°Р»СЊ
+double *D1 = (double*)calloc((size_t)stepAmountX, sizeof(double));  // Р·РґРµСЃСЊ РїСЂР°РІР°СЏ С‡Р°СЃС‚СЊ СЃРёСЃС‚РµРјС‹
+double *X  = (double*)calloc((size_t)stepAmountX, sizeof(double));  // РјРµС‚РѕРґ РїСЂРѕРіРѕРЅРєРё Р·Р°РїРёСЃС‹РІР°РµС‚ СЂРµС€РµРЅРёРµ
 
-double *ksi   = (double*)calloc((size_t)stepAmountX + 1, sizeof(double));  // прогоночные коэфициенты
-double *eta   = (double*)calloc((size_t)stepAmountX + 1, sizeof(double));  // прогоночные коэфициенты
+double *ksi   = (double*)calloc((size_t)stepAmountX + 1, sizeof(double));  // РїСЂРѕРіРѕРЅРѕС‡РЅС‹Рµ РєРѕСЌС„РёС†РёРµРЅС‚С‹
+double *eta   = (double*)calloc((size_t)stepAmountX + 1, sizeof(double));  // РїСЂРѕРіРѕРЅРѕС‡РЅС‹Рµ РєРѕСЌС„РёС†РёРµРЅС‚С‹
 // ---------------------------------------------------------------------------------------------------------------------
 
-double *func     = (double*)calloc((size_t)stepAmountX, sizeof(double));  // массив значений косинуса
-double *funcDer  = (double*)calloc((size_t)stepAmountX, sizeof(double));  // 1 производная косинуса
-double *funcDer2 = (double*)calloc((size_t)stepAmountX, sizeof(double));  // 2 производная косинуса
-double *funcDer3 = (double*)calloc((size_t)stepAmountX, sizeof(double));  // 3 производная
+double *func     = (double*)calloc((size_t)stepAmountX, sizeof(double));  // РјР°СЃСЃРёРІ Р·РЅР°С‡РµРЅРёР№ РєРѕСЃРёРЅСѓСЃР°
+double *funcDer  = (double*)calloc((size_t)stepAmountX, sizeof(double));  // 1 РїСЂРѕРёР·РІРѕРґРЅР°СЏ РєРѕСЃРёРЅСѓСЃР°
+double *funcDer2 = (double*)calloc((size_t)stepAmountX, sizeof(double));  // 2 РїСЂРѕРёР·РІРѕРґРЅР°СЏ РєРѕСЃРёРЅСѓСЃР°
+double *funcDer3 = (double*)calloc((size_t)stepAmountX, sizeof(double));  // 3 РїСЂРѕРёР·РІРѕРґРЅР°СЏ
 
-double **U   = (double**)calloc((size_t)myStep, sizeof(double*));  // временный массив для значений V
-double **Fin = (double**)calloc((size_t)myStep, sizeof(double*));  // конечный массив результатов (нормированный)
+double **U   = (double**)calloc((size_t)myStep, sizeof(double*));  // РІСЂРµРјРµРЅРЅС‹Р№ РјР°СЃСЃРёРІ РґР»СЏ Р·РЅР°С‡РµРЅРёР№ V
+double **Fin = (double**)calloc((size_t)myStep, sizeof(double*));  // РєРѕРЅРµС‡РЅС‹Р№ РјР°СЃСЃРёРІ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ (РЅРѕСЂРјРёСЂРѕРІР°РЅРЅС‹Р№)
 
 double *Us = (double*)calloc((size_t)stepAmountX, sizeof(double));
 
 double* Coeff = (double*)calloc((size_t)myStep, sizeof(double));
 
 
-//метод прогонки
-//sloy - номер временного слоя на котором выполняется прогонка
+//РјРµС‚РѕРґ РїСЂРѕРіРѕРЅРєРё
+//sloy - РЅРѕРјРµСЂ РІСЂРµРјРµРЅРЅРѕРіРѕ СЃР»РѕСЏ РЅР° РєРѕС‚РѕСЂРѕРј РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ РїСЂРѕРіРѕРЅРєР°
 void Shuttle
 	(const int sloy)
 {
@@ -94,15 +94,15 @@ void Shuttle
 }
 
 
-//гамма функция
-//input - аргумент гамма функции
+//РіР°РјРјР° С„СѓРЅРєС†РёСЏ
+//input - Р°СЂРіСѓРјРµРЅС‚ РіР°РјРјР° С„СѓРЅРєС†РёРё
 double gamma
 	(const double input)
 {
 	return alglib::gammafunction(input);
 }
 
-//записывает результаты в файл, с нормировкой или без неё
+//Р·Р°РїРёСЃС‹РІР°РµС‚ СЂРµР·СѓР»СЊС‚Р°С‚С‹ РІ С„Р°Р№Р», СЃ РЅРѕСЂРјРёСЂРѕРІРєРѕР№ РёР»Рё Р±РµР· РЅРµС‘
 void toFile
 	(const int    t,
 	 const double d)
@@ -113,16 +113,16 @@ void toFile
 	std::fstream str;
 	str.open("out.txt", std::ios::out);
 	
-	//for(int n=0;n<t;n+=49)	//для вывода малого количества графиков (чтобы не захламлять графиками картинку)
+	//for(int n=0;n<t;n+=49)	//РґР»СЏ РІС‹РІРѕРґР° РјР°Р»РѕРіРѕ РєРѕР»РёС‡РµСЃС‚РІР° РіСЂР°С„РёРєРѕРІ (С‡С‚РѕР±С‹ РЅРµ Р·Р°С…Р»Р°РјР»СЏС‚СЊ РіСЂР°С„РёРєР°РјРё РєР°СЂС‚РёРЅРєСѓ)
 	for (int n = 0; n < t; n++)
 	{
-		str << "#" << n << std::endl;  // для gnuplot
+		str << "#" << n << std::endl;  // РґР»СЏ gnuplot
 		shag = 0;
 		for (int i = 0; i < stepAmountX; i++)
 		{
 			if(flag)
 			{
-				str << n * dt << "\t" << shag << "\t" << Fin[n][i] / gam << endl;  // нормировка по Гамма(альфа)
+				str << n * dt << "\t" << shag << "\t" << Fin[n][i] / gam << endl;  // РЅРѕСЂРјРёСЂРѕРІРєР° РїРѕ Р“Р°РјРјР°(Р°Р»СЊС„Р°)
 			}
 			else
 			{
@@ -135,14 +135,14 @@ void toFile
 	str.close();
 }
 
-//гипергеометрическая функция
+//РіРёРїРµСЂРіРµРѕРјРµС‚СЂРёС‡РµСЃРєР°СЏ С„СѓРЅРєС†РёСЏ
 double hyperGeometric
 	(const double a,
 	 const double b,
 	 const double c,
 	 const double z)
 {
-	// подстановка 0
+	// РїРѕРґСЃС‚Р°РЅРѕРІРєР° 0
 	if (z == 0)
 	{
 		return 1.0;
@@ -151,7 +151,7 @@ double hyperGeometric
 	double res  = 1.0;
 	double res2 = 1.0;
 	
-	const int hyperIter = 20;  // кол-во слагаемых для гипергеометрической функции
+	const int hyperIter = 20;  // РєРѕР»-РІРѕ СЃР»Р°РіР°РµРјС‹С… РґР»СЏ РіРёРїРµСЂРіРµРѕРјРµС‚СЂРёС‡РµСЃРєРѕР№ С„СѓРЅРєС†РёРё
 	
 	for (int i = 1; i < hyperIter; i++)
 	{
@@ -167,7 +167,7 @@ double hyperGeometric
 }
 
 
-//функция - начальное условие
+//С„СѓРЅРєС†РёСЏ - РЅР°С‡Р°Р»СЊРЅРѕРµ СѓСЃР»РѕРІРёРµ
 double fCos
 	(double x)
 {
@@ -198,7 +198,7 @@ double fCos
 	}
 }
 
-//функция - граничное условие
+//С„СѓРЅРєС†РёСЏ - РіСЂР°РЅРёС‡РЅРѕРµ СѓСЃР»РѕРІРёРµ
 double g
 	(double t)
 {
@@ -207,8 +207,8 @@ double g
 	//return 1.;
 }
 
-//центральная производная
-//sloy - временной слой на котором берется производная
+//С†РµРЅС‚СЂР°Р»СЊРЅР°СЏ РїСЂРѕРёР·РІРѕРґРЅР°СЏ
+//sloy - РІСЂРµРјРµРЅРЅРѕР№ СЃР»РѕР№ РЅР° РєРѕС‚РѕСЂРѕРј Р±РµСЂРµС‚СЃСЏ РїСЂРѕРёР·РІРѕРґРЅР°СЏ
 //nextTochka - X(i+1)
 //currTochka - X(i-1)
 double centrDeriv
@@ -220,7 +220,7 @@ double centrDeriv
 }
 
 // dt/()
-//вычисляет интеграл
+//РІС‹С‡РёСЃР»СЏРµС‚ РёРЅС‚РµРіСЂР°Р»
 //podstanovka - Tn
 //up - T(j+1)
 //down - Tj
@@ -260,16 +260,16 @@ double newIntegral2
 	return result;
 }
 
-//подсчет дробного интеграла на n слое
-//down - номер временного слоя
-//order -  порядок дробного интеграла
-//step - номер шага по Ox
+//РїРѕРґСЃС‡РµС‚ РґСЂРѕР±РЅРѕРіРѕ РёРЅС‚РµРіСЂР°Р»Р° РЅР° n СЃР»РѕРµ
+//down - РЅРѕРјРµСЂ РІСЂРµРјРµРЅРЅРѕРіРѕ СЃР»РѕСЏ
+//order -  РїРѕСЂСЏРґРѕРє РґСЂРѕР±РЅРѕРіРѕ РёРЅС‚РµРіСЂР°Р»Р°
+//step - РЅРѕРјРµСЂ С€Р°РіР° РїРѕ Ox
 double fracInt
 	(const double down,
 	 const double order,
 	 const int    step)
 {
-	//случай выхода за границу сетки
+	//СЃР»СѓС‡Р°Р№ РІС‹С…РѕРґР° Р·Р° РіСЂР°РЅРёС†Сѓ СЃРµС‚РєРё
 	if (step >= stepAmountX)
 	{
 		return 0.;
@@ -289,10 +289,10 @@ double fracInt
 
 int main()
 {
-	omp_set_dynamic(0);  // запретить библиотеке openmp менять число потоков во время исполнения программы
+	omp_set_dynamic(0);  // Р·Р°РїСЂРµС‚РёС‚СЊ Р±РёР±Р»РёРѕС‚РµРєРµ openmp РјРµРЅСЏС‚СЊ С‡РёСЃР»Рѕ РїРѕС‚РѕРєРѕРІ РІРѕ РІСЂРµРјСЏ РёСЃРїРѕР»РЅРµРЅРёСЏ РїСЂРѕРіСЂР°РјРјС‹
 	omp_set_num_threads(threadNum);
 	
-	// переменные для подсчета потраченного времени
+	// РїРµСЂРµРјРµРЅРЅС‹Рµ РґР»СЏ РїРѕРґСЃС‡РµС‚Р° РїРѕС‚СЂР°С‡РµРЅРЅРѕРіРѕ РІСЂРµРјРµРЅРё
 	const double start = omp_get_wtime();
 	
 	cout.precision(15);
@@ -319,7 +319,7 @@ int main()
 	
 	double time = 0.0;
 	
-	// проинициализируем начальные условия -------------------------------------------------------------------------------
+	// РїСЂРѕРёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РЅР°С‡Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ -------------------------------------------------------------------------------
 	for (int i = 0; i < myStep; i++)
 	{
 		U[i]   = (double*)calloc((size_t)stepAmountX, sizeof(double));
@@ -332,13 +332,13 @@ int main()
 	#pragma omp parallel for
 	for (int i = 0; i < stepAmountX; i++)
 	{
-		func[i] = fCos(i * dx);  // начальное условие
+		func[i] = fCos(i * dx);  // РЅР°С‡Р°Р»СЊРЅРѕРµ СѓСЃР»РѕРІРёРµ
 		Us[i] = func[i] * pow(s, alpha - 1.0) / gamma(alpha);
 		
 		fiveUp[i]   =   constFive;
 		fiveDown[i] = - constFive;
 		
-		U[0][i] = 0;  // начальные слои
+		U[0][i] = 0;  // РЅР°С‡Р°Р»СЊРЅС‹Рµ СЃР»РѕРё
 		U[1][i] = 0;
 	}
 	
@@ -347,7 +347,7 @@ int main()
 	for (int i = 2; i< myStep; i++)
 	{
 		Coeff[i] = pow(-1.0,i) * Coeff[i-1] * (alpha - i + 1.0) / i;
-		U[i][0]=g(s + n * dt) - fCos(0) * pow(s, alpha - 1.0) / gamma(alpha);  // левый край
+		U[i][0]=g(s + n * dt) - fCos(0) * pow(s, alpha - 1.0) / gamma(alpha);  // Р»РµРІС‹Р№ РєСЂР°Р№
 	}
 
 	double constFunc  = 2.0 * dx;
@@ -368,7 +368,7 @@ int main()
 	funcDer[stepAmountX - 1] = funcDer2[stepAmountX - 1] = funcDer3[stepAmountX - 1] = func[stepAmountX - 1];
 	// -------------------------------------------------------------------------------------------------------------------
 	
-	// Явная схема
+	// РЇРІРЅР°СЏ СЃС…РµРјР°
 	
 	int i = 0;
 	
@@ -407,7 +407,7 @@ int main()
 	}
 
 	//----------------------------------------------------------------------------------------
-	//Неявная схема
+	//РќРµСЏРІРЅР°СЏ СЃС…РµРјР°
 	double const1 = - A * pow(dt, alpha) / pow(dx, 2.0);
 	double const2 = pow(dt, alpha) * 0.5;
 	double const3 = 1.0 / (2.0 * dx) * pow(dt, 1.0 - alpha) / gamma(3.0 - alpha);
@@ -443,7 +443,7 @@ int main()
 				sumGroup=0;
 				sumGroup2=0;
 				
-				//слагаемые - остатки от n+1 fracInt'а
+				//СЃР»Р°РіР°РµРјС‹Рµ - РѕСЃС‚Р°С‚РєРё РѕС‚ n+1 fracInt'Р°
 				for (int j=1;j<=n-1;j++)
 				{
 					sumGroup+=U[j][i+1]*(pow(n+1-j,1-alpha)-pow(n-j,1-alpha))/(1-alpha)  +  (U[j+1][i+1]-U[j][i+1])*(pow(n+1-j,2-alpha)-pow(n-j,2-alpha))/((1-alpha)*(2-alpha))-pow(n-j,1-alpha)/(1-alpha);
@@ -454,7 +454,7 @@ int main()
 				}
 				D1[i-1]=-(sum1  -  ((sin(M_PI*alpha)*pow(s,alpha)*func[i])/const5) + ((pow(s,alpha-1)*func[i]*sin(M_PI*alpha))/(M_PI*pow(n,alpha)))  +  ((pow(dt,alpha)*func[i])*const7)*((sin(M_PI*alpha)*pow(s,alpha)*funcDer[i]*hyperConst1)/const4+(funcDer[i]*const7)+((1.)/(2*dx))*(fracInt(n,1-alpha,i+1)-fracInt(n,1-alpha,i-1)))  +  ((pow(dt,alpha))/2.)*(U[n][i]+func[i]*const7)*(sin(M_PI*alpha)*pow(s,alpha)*funcDer[i]*hyperConst2/(const5*alpha)+(funcDer[i]*const7)+(1./(2*dx))*(sumGroup-sumGroup2))  -  funcDer2[i]*const6);
 			}
-			//---(ищем A10, C9, B9, B10, D9, D10, при 11 узлах) формула универсальна для всех не найденных A B C D--------
+			//---(РёС‰РµРј A10, C9, B9, B10, D9, D10, РїСЂРё 11 СѓР·Р»Р°С…) С„РѕСЂРјСѓР»Р° СѓРЅРёРІРµСЂСЃР°Р»СЊРЅР° РґР»СЏ РІСЃРµС… РЅРµ РЅР°Р№РґРµРЅРЅС‹С… A B C D--------
 			for(int i=stepAmountX-2;i<stepAmountX-1;i++)
 			{
 				for(int j=1;j<=n;j++)
@@ -467,7 +467,7 @@ int main()
 				C1[i-1]=(-A*pow(dt,alpha))/(pow(dx,2)) + (pow(dt,alpha))/2.*(U[n][i]+func[i]*pow(s,alpha-1)/gamma(alpha))*((1)/(2.*dx))*(pow(dt,1-alpha)/gamma(3-alpha));
 				//i
 				B1[i-1]=1 + ((pow(dt,alpha))/2.)*((sin(M_PI*alpha)*pow(s,alpha)*funcDer[i]*hyperGeometric(alpha,alpha,alpha+1,s/(s+(n-1)*dt)))/(M_PI*alpha*pow(s+(n-1)*dt,alpha))+(funcDer[i]*pow(s,alpha-1)/(gamma(alpha))) + (1./(2*dx))*(fracInt(n,1-alpha,i+1)-fracInt(n,1-alpha,i-1))) + ((2*A*pow(dt,alpha))/pow(dx,2.));
-				//последняя B (B10)
+				//РїРѕСЃР»РµРґРЅСЏСЏ B (B10)
 				B1[i]=1;
 				sumGroup=0;
 				sumGroup2=0;
