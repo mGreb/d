@@ -23,17 +23,17 @@ int n = 0;  // номер слоя по времени
 
 const bool flag = false;  // Выбор задачи(false - основная задача, true - задача на разрывную функцию)
 
-const double alpha = 0.9;  // задайте альфа на полуинтервале (0;1]
-const double dx = 0.1;  // шаг по х
+const double alpha = 0.5;  // задайте альфа на полуинтервале (0;1]
+const double dx = 0.001;  // шаг по х
 const double dt = 0.1 * pow(dx, 3.0 / alpha) / A;
 const double s = 0.1;  // самая первая ступенька (тесная зависимость с alpha, по какой формуле?)
 
 const int stepAmountX = int((D - C) / dx + 1);  // кол-во узлов сеточной функции
 const int stepAmountT = int((T2 - T1) / dt);  // полные временные слои
-const int myStep = stepAmountT;  // 1000;  // число временных слоев необходимых для вычисления
+const int myStep = 2000;  // число временных слоев необходимых для вычисления
 const int dodo = 2;  // заглушка для явной схемы, показывающая с КАКОГО временного слоя начинать неявную схему
 
-const int threadNum = 1;  // number of threads for openmp
+const int threadNum = 4;  // number of threads for openmp
 
 // массивы для прогонки ------------------------------------------------------------------------------------------------
 double *fiveUp = (double*)calloc((size_t)stepAmountX, sizeof(double));
@@ -59,7 +59,7 @@ double **Fin = (double**)calloc((size_t)myStep, sizeof(double*));  // конеч
 
 double *Us = (double*)calloc((size_t)stepAmountX, sizeof(double));
 
-double* Coeff = (double*)calloc((size_t)myStep, sizeof(double));
+double *Coeff = (double*)calloc((size_t)myStep, sizeof(double));
 
 
 //метод прогонки
@@ -200,23 +200,13 @@ double fCos
 
 //функция - граничное условие
 double g
-	(double t)
+	(const double t)
 {
+	(void)t;
+	
 	return 0.;
 	//return gamma(alpha);
 	//return 1.;
-}
-
-//центральная производная
-//sloy - временной слой на котором берется производная
-//nextTochka - X(i+1)
-//currTochka - X(i-1)
-double centrDeriv
-	(const int sloy,
-	 const int nextTochka,
-	 const int currTochka)
-{
-	return (U[sloy][nextTochka]-U[sloy][currTochka]) * 0.5 / dx;
 }
 
 // dt/()
@@ -316,8 +306,6 @@ int main()
 	double allSum = 0.0;
 	double sumGroup = 0.0;
 	double sumGroup2 = 0.0;
-	
-	double time = 0.0;
 	
 	// проинициализируем начальные условия -------------------------------------------------------------------------------
 	for (int i = 0; i < myStep; i++)
@@ -521,11 +509,11 @@ int main()
 		}
 	}
 	
+	toFile(myStep,dx);
+	
 	const double end = omp_get_wtime();
 	const double total_time = end - start;
-	cout<<"time= "<<end<<" seconds\n";
-	
-	toFile(myStep,dx);
+	cout << "time = " << total_time << " seconds\n";
 	
 	system("gnuplot testOMP.plt");
 	system("gnuplot plot.plt");

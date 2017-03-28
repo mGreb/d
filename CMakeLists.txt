@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.5)
 
 SET(CMAKE_VERBOSE_MAKEFILE "ON")
 SET(CMAKE_COLOR_MAKEFILE "ON")
