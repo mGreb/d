@@ -1,0 +1,18 @@
+Рассматривается задача нахождения численного решения начально-краевой задачи для дробно-дифференциального уравнения
+Кортевега-де-Фриза с дробной производной Римана-Лиувилля по времени.
+We consider the problem of finding a numerical solution of the initial boundary value problem for the Korteweg-de Vries fractional differential equation
+with Riemann-Liouville time derivative.
+
+Наличие дробной производной приводит к линейному росту объема вычислений с увеличением номера временного шага.
+The presence of a fractional derivative leads to a linear increase in the amount of computation with an increase of time steps taken.
+
+В результате даже решение относительно простой одномерной задачи требует весьма значительных вычислительных ресурсов,
+что приводит к необходимости разработки параллельных алгоритмов ее решения.
+As a result, solving a relatively simple one-dimensional problem requires very considerable computational resources,
+which leads to the necessity for developing parallel algorithms for its solving.
+
+В докладе приводятся описание численной схемы решения задачи и алгоритма ее распараллеливания, а также оценка его эффективности.
+The paper describes a numerical scheme for solving the problem and an algorithm for its parallelization, as well as an assessment of its effectiveness.
+
+Обсуждаются результаты вычислительных экспериментов на системах с общей памятью, подтверждающие эффективность предложенных подходов.
+The results of computational experiments on systems with shared memory are discussed, confirming the effectiveness of the proposed approach.

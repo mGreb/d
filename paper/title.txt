@@ -1,3 +1,2 @@
 Параллельный алгоритм решения начально-краевой задачи для дробно-дифференциального уравнения Кортевега-де-Фриза
-
 Parallel algorithm for solving initial boundary value problem for Korteweg–de Vries fractional derivative equation
