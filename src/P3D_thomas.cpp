@@ -17,7 +17,7 @@ void P3D::P3D_thomas::thomas
 	       std::vector<double> &result)
 {
 	const size_t size = result.size();
-
+	
 #ifndef NDEBUG
 	for(size_t i = 0; i < size; ++i)
 	{
