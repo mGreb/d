@@ -1,0 +1,160 @@
+\documentclass[11pt, oneside, a4paper]{article}
+\usepackage[cp1251]{inputenc} % encoding
+\usepackage[english]{babel} % English hyphenation
+\usepackage{graphicx}          % to include the graphics
+\usepackage{cite}              % for correct references design 
+\usepackage{pavt-en}                                
+
+\begin{document}
+
+% \title - paper title
+% \authors - authors list
+
+\title{Guidelines for the authors of the PCT conference\\
+for formatting of full and short papers \\
+(\LaTeX document)\footnote{Gratitude and references to the grant are made out as a footnote to the title of the paper.}}
+
+\authors{A.B.~First\superscript{1}, C.D.~Second\superscript{1}, E.F.~Third\superscript{2}}
+\organizations{OrganisationA\superscript{1}, OrganisationB\superscript{2}}
+
+% abstract is contained in the  abstract environment 
+\begin{abstract}
+Abstract contains a brief description of the paper, it should not exceed 10~lines. 
+Abstract is separated by a single blank line with 16~pt size above and below. 
+Left and right margins are of 15~mm width. Abstract is formatted as justified text 
+with 10~pt Times New Roman font. This text is formatted according to all requirements 
+and can be used as a template.
+\end{abstract}
+
+\keywords{from 3 to 10 key words and (or) the phrases separated by commas should be specified here.}
+
+% \section{title} - the header is the first level section
+% \subsection{title} - the header is the second level section
+% \subsubsection{title} - the header is the third level section
+% Do not use the nesting level of more than three headlines!
+% Each paragraph of the paper begins with \par command or empty line
+
+\section{Introduction}
+This document contains guidelines for \LaTeX users 
+(you can also use guidelines for MS~Word users) and can be considered as a template. 
+
+\section{Paper preparation}
+Pages of the presented paper should have size
+$297 \times 210$~mm (A4 format). All margins should have the same size of 25~mm.
+
+Numbering, forced page breaks and footers are not allowed.
+
+Times New Roman (or equivalent) is used as a font of the paper. 
+Paragraphs are typed by 11~pt font size with width alignment, 
+single line spacing, and automatic hyphenation. Using bold style in the text is 
+undesirable. Paragraphs are not separated by intervals and begin with a 7~mm indented line.
+
+\subsection{Headings}
+For the title of the paper bold Times New Roman font with 16~pt size and center alignment should be used. 
+Title is separated by one blank line from all the text above.
+
+List of authors appears in 12~pt Times New Roman with center alignment and is 
+separated from the title by a single blank line with 16~pt size. Authors are listed 
+through commas, initials are written before the last name. 
+
+Organization has 12~pt Times New Roman font with center alignment and is separated 
+from the list of authors by one blank line of 6~pt size. Please, specify the official names (not abbreviations) of organizations. 
+If authors work in different organizations, two or more organizations can be listed through commas. 
+In this case author's affiliation is identified by the footnote.
+
+Header of a section is made without a break from the first paragraph with left-alignment. 
+Above and below the header there is a single blank line separation. 
+Examples of titles and styles are shown in table ~\ref{table1}.
+
+\subsection{Figures and tables}
+All figures and tables should have a caption, typed by 10~pt font with top and bottom 6~pt 
+separation and central alignment. Caption to a table is placed above the table, 
+caption to a figure~--- under the figure. 
+
+\textbf{Assertions}, \textbf{lemmas} and \textbf{theorems} should be formatted as separate paragraphs and 
+should be numbered in order of appearance starting from number one, for example, \textbf{Theorem~1}.
+
+\begin{table}[!ht]
+	\caption{Heading examples}
+	\label{table1}
+	\begin{center}
+	\begin{tabular}{|l|l|}
+		\hline
+		\multicolumn{1}{|c|}{\bf Type of the header} &
+		\multicolumn{1}{c|}{\bf Font size and style} \\
+		\hline
+		\LARGE\bf A title of the paper & 16~pt, bold \\
+		\hline
+		\Large\bf First-level header & 14~pt, bold \\
+		\hline
+		\large\bf Second-level header& 12~pt, bold \\
+		\hline
+		\large\it Third-level header & 12~pt, italic \\
+		\hline
+	\end{tabular}
+	\end{center}
+\end{table}
+
+\subsection{Formulae and source code}
+Formulae are typed with standard \LaTeX features.
+
+Source code should be formatted with Courier New font(or equivalent), 
+of 10~pt size (see an example on Fig.~\ref{listing-sort}). 
+Bold and italic font is allowed in the source code.
+
+\begin{figure}[h]
+\begin{lstlisting}[language=c]
+void selectionsort(ap::real_1d_array& arr, const int& n)
+{
+    int i;
+    int j;
+    int k;
+    double m;
+    for(i = 1; i <= n; i++) {
+        m = arr(i-1);
+        k = i;
+        for(j = i; j <= n; j++) {
+            if( m>arr(j-1) ) {
+                m = arr(j-1);
+                k = j;
+            }
+        }
+        arr(k-1) = arr(i-1);
+        arr(i-1) = m;
+    }
+}
+\end{lstlisting}
+\caption{Selection sort algorithm}
+\label{listing-sort}
+\end{figure}
+
+\subsection{Footnotes and cross-references}
+Footnotes are placed at the bottom of the page and numbered with Arabic numerals 
+\footnote{Footnote numeration starts from the beginning on every new page.}. 
+Acknowledgements for the financial support should be performed 
+as a footnote to the title of the paper and 
+denoted by * symbol. 
+
+Cross-references should be placed in square brackets and listed in ascending order, separated 
+by commas or dashes, for example:~\cite{stonebraker},
+\cite{stonebraker,  amit, cadez}, \cite{yao, amit,cadez}. 
+
+Reference list is numbered in Arabic numerals with font of 11~pt and with left-alignment.
+
+\begin{biblio}
+
+\bibitem{stonebraker}
+Stonebraker M., Kemnitz G. The POSTGRES Next-generation Database Management System // Communications of the ACM. 1991. Vol. 34, No. 10. P. 78--92.
+
+\bibitem{yao}
+Yao B., Li F., Kumar P. K Nearest Neighbor Queries and kNN-Joins in Large Relational Databases (Almost) for Free // Proceedings of the 26th International Conference on Data Engineering, ICDE 2010, March 1-6, 2010, Long Beach, California, USA. IEEE, 2010. P. 4--15.
+
+\bibitem{amit}
+Amit~Y. 2D Object Detection and Recognition: models, algorithms and networks.
+MIT Press, 2002. 325~p.
+
+\bibitem{cadez}
+Cadez I., Heckerman D., Meek C., et al. Visualization of Navigation Patterns on a Web Site Using Model Based Clustering. Technical Report MSR TR 00 18. Microsoft Research. 2000. URL: http://research.microsoft.com/pubs/69752/tr-2000-18.pdf (accessed: 13.12.2009).
+
+\end{biblio}
+\end{document}

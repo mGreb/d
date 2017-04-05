@@ -1,0 +1,160 @@
+% To make a title use instruction \title{}
+% To make an authors list use instruction \authorsperrow{} and author{}
+% Abstract begins with instruction \abstract and ends by \endabstract
+% Section headings are formed with commands \section{}, \subsection{}, \subsubsection{}
+% To obtain theorems, lemmas and consequences use environments teo, lem and cor accordingly
+% Proof of the theorem begins with instruction \proof and ends by \endproof
+% References are placed in the environment biblio.
+
+
+\ProvidesPackage{pavt-en }
+\usepackage{ifthen}
+\usepackage{listings}
+\usepackage{changepage} 
+
+% Page parameters
+\oddsidemargin=-0.4mm
+%\evensidemargin=-0.4mm
+\topmargin=-0.4mm
+\headheight=0mm
+\headsep=0mm
+\headheight= 0mm
+\textheight = 247mm
+\textwidth = 160mm
+\footskip=0mm
+
+% The format of the paper title
+\def\title#1{
+\begingroup
+ \def\thefootnote{\fnsymbol{footnote}} % Setting the type of the footnote for acknowledgements
+{\LARGE\bf\centering#1\par}
+\endgroup
+ \setcounter{footnote}{0} % Reset the counter after acknowledgements printing
+ \vspace{16pt}
+}
+
+% Authors list format
+\def\authors#1{
+{\large\centering#1\par}
+ \vspace{6pt}
+}
+
+% Organisation list format
+\def\organizations#1{
+{\large\centering#1\par}
+ \vspace{16pt}
+}
+
+
+
+\renewenvironment{abstract}{
+	\fontseries{m}
+	\fontsize{10pt}{12pt}
+	\selectfont
+	\setlength{\parindent}{0pt}
+	\setlength{\leftskip}{15mm}
+	\setlength{\rightskip}{15mm}
+}{
+
+}
+
+% Keywords list format
+\newcommand{\keywords}[1]{%
+	\begin{abstract}
+	{\vspace{6pt}
+	 {\it Keywords:~}#1}%
+	\end{abstract}
+}
+
+% Point in the header section
+\renewcommand{\@seccntformat}[1]{%
+	\csname the#1\endcsname.
+}
+
+\pagestyle{empty} % No footers and numbering
+
+% Section headers format
+\def\section{\@startsection{section} % counter name
+	    {1} % section level
+	    {0pt} % left margin
+	    {11pt} % top margin
+	    {11pt} % bottom margin
+	    {\Large\bf}}
+
+\def\subsection{\@startsection{subsection} % counter name
+	    {1} % section level
+	    {0pt} % left margin
+	    {11pt} % top margin
+	    {11pt} % bottom margin
+	    {\large\bf}}
+
+\def\subsubsection{\@startsection{subsubsection} % counter name
+	    {1} % section level
+	    {0pt} % left margin
+	    {11pt} % top margin
+	    {11pt} % bottom margin
+	    {\large\it}}
+
+% Paragraph parameters
+\parindent=7mm % Specifying the indentation
+\parskip=0mm
+\leftskip=0mm
+\rightskip=0mm
+
+% Caption to tables and figures
+\abovecaptionskip=6pt
+\belowcaptionskip=6pt
+\def\capfigure{figure}
+\def\captable{table}
+\renewcommand{\@makecaption}[2]{%
+\vspace{\abovecaptionskip}%
+\sbox{\@tempboxa}{\small\textbf{#1.} #2}
+\ifdim \wd\@tempboxa >\hsize
+{\small\textbf{#1.} #2\par}
+\else
+\ifx\@captype\capfigure
+	\global\@minipagefalse
+	\hbox to \hsize {\small\hfil \textbf{#1.} #2 \hfil}%
+	%\hbox to \hsize {\textbf{\small #1}. #2 \hfil}%
+\else
+	\hbox to \hsize {\small\hfil \textbf{#1.} #2 \hfil}%
+	
+\fi
+\fi
+\vspace{\belowcaptionskip}}
+
+\newtheorem{teo}{Theorem}
+\newtheorem{lem}{Lemma}
+\newtheorem{hyp}{Hypothesis}
+\newtheorem{prp}{Proposal}
+\newtheorem{ass}{Assertion}
+\newtheorem{cor}{Consequence}
+
+\def\proof{\par\mbox{P r o o f.}\hspace{2mm}}
+\def\endproof{\par\mbox{Q.E.D.}\hspace{2mm}}
+
+\@addtoreset{footnote}{page} % Footnotes numbering begins begins anew on every page 
+
+\renewcommand{\arraystretch}{1.75}
+
+\newenvironment{biblio}{%
+                  \renewcommand{\refname}{References}%
+		  \raggedright
+                  \begin{thebibliography}{99}}%
+                  {\end{thebibliography}}
+
+\renewcommand{\@biblabel}[1]{#1.} % Reference list format
+
+% Format of listings
+\lstset{
+	basicstyle=\ttfamily\fontsize{10pt}{10pt}\selectfont,
+	keywordstyle=\tt\bf,
+	frame=single,
+	belowskip=0pt
+}
+
+% Subscripts and superscripts in the text mode
+%\newcommand{\superscript}[1]{\ensuremath{^{\textrm{#1}}}}
+%\newcommand{\subscript}[1]{\ensuremath{_{\textrm{#1}}}}
+\newcommand{\superscript}[1]{{\footnotesize\raisebox{0.5em}{#1}}}
+\newcommand{\subscript}[1]{{\footnotesize\raisebox{-0.5em}{#1}}}
