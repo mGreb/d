@@ -1,0 +1,186 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[left=1cm, right=1cm, top=1cm, bottom=1.5cm, bindingoffset=0cm]{geometry}
+\usepackage{breqn}
+
+\newcommand {\partt} {\frac{\partial}{\partial t}}
+\newcommand{\Uxs}[1]{ \frac{f(x)\cdot{#1}^{\alpha-1}}{\Gamma(\alpha)}}
+
+\begin{document}
+
+	\begin{equation}
+	{}_{0}D_{t}^{\alpha}U(x,t) + U(x,t)\cdot {}_{0}J^{1-\alpha}_{t}U_{x}(x,t)=a \cdot U_{xxx}(x,t), \alpha \in (0, 1), a = const
+	\end{equation}
+	
+	\begin{equation}
+	{}_{0}J^{1-\alpha}_{t}U(x,t) \bigg{|}_{t=0} = f(x), U_{x}(x,t) \bigg{|}_{x=0}=0, U_{x}(x,t) \bigg{|}_{x=1}=0, U_{xx}(x,t) \bigg{|}_{x=1}=0
+	\end{equation}
+	
+\noindent\rule{\linewidth}{0.4pt}
+	\begin{equation}
+	{}_{0}I_{t}^{1-\alpha} U(x,t) = \frac{1}{\Gamma(1-\alpha)} \int_{0}^{t} \frac{U(x,\tau)}{(t-\tau)^{\alpha}}d\tau
+	\end{equation}
+	
+	\begin{equation}
+	{}_{0}D_{t}^{\alpha} U(x,t) = \frac{1}{\Gamma(1-\alpha)} \partt \int_{0}^{t} \frac{U(x,\tau)}{(t-\tau)^{\alpha}}d\tau
+	\end{equation}
+	
+\noindent\rule{\linewidth}{0.4pt}
+	\begin{equation}
+	\Gamma(z)=\int_{0}^{+\infty}t^{z-1} e^{-t} dt
+	\end{equation}
+	
+	\begin{equation}
+	\Gamma(z+1)=\Gamma(z)\cdot z
+	\end{equation}
+	
+	\begin{equation}
+	\Gamma(\alpha)\cdot \Gamma(-\alpha) = \frac{- \pi}{\alpha \cdot \sin(\pi \alpha)}
+	\end{equation}
+	
+	\begin{equation}
+	\Gamma(\alpha)\cdot \Gamma(1-\alpha) = \frac{\pi}{\sin(\pi \alpha)}
+	\end{equation}
+	
+\noindent\rule{\linewidth}{0.4pt}
+	\begin{equation}
+	\lim_{t \to 0} {}_{0}I_{t}^{1-\alpha} U(x,t) = \lim_{t \to 0}\frac{U(x,t)\cdot \Gamma(\alpha)}{t^{\alpha-1}} = f(x)
+	\end{equation}
+	
+	\begin{equation}
+	U(x,t) = \frac{t^{\alpha-1} \cdot f(x)}{\Gamma(\alpha)}, t \in (0,s)
+	\end{equation}
+	
+	\begin{equation}
+	U(x;s) = \frac{s^{\alpha-1} \cdot f(x)}{\Gamma(\alpha)}
+	\end{equation}
+
+\noindent\rule{\linewidth}{0.4pt}
+	\begin{equation}
+	{}_{0}D_{t}^{\alpha} U(x,t)  = \frac{1}{\Gamma(1-\alpha)} \partt \int_{0}^{s} \frac{U(x,\tau)}{(t-\tau)^{\alpha}}d\tau + \frac{1}{\Gamma(1-\alpha)} \partt \int_{s}^{t} \frac{U(x,\tau)}{(t-\tau)^{\alpha}}d\tau
+	\end{equation}
+
+	\begin{equation}
+	{}_{0}D_{t}^{\alpha} U(x,t)  = \frac{1}{\Gamma(1-\alpha)} \int_{0}^{s} \frac{-\alpha \cdot U(x;\tau)}{(t-\tau)^{\alpha+1}}d\tau + {}_{s}D_{t}^{\alpha} U(x,t)
+	\end{equation}
+
+	\begin{equation}
+	{}_{0}D_{t}^{\alpha} U(x,t)  = \frac{-\alpha\cdot f(x)}{\Gamma(1-\alpha)\cdot\Gamma(\alpha)} \int_{0}^{s} \frac{\tau^{\alpha-1}} {(t-\tau)^{\alpha+1}}d\tau
+		+ {}_{s}D_{t}^{\alpha} U(x,t)
+	\end{equation}
+
+	\begin{equation}
+	\int_{0}^{s} \frac{\tau^{\alpha-1}} {(t-\tau)^{\alpha+1}}d\tau =\frac{s^{\alpha}}{\alpha t (t-s)^{\alpha}}
+	\end{equation}
+
+	\begin{equation}
+	{}_{0}D_{t}^{\alpha} U(x,t)  = \frac{-\alpha\cdot f(x)}{\Gamma(1-\alpha)\cdot\Gamma(\alpha)} \cdot \frac{s^{\alpha}}{\alpha t (t-s)^{\alpha}} + {}_{s}D_{t}^{\alpha} U(x,t)
+	\end{equation}
+
+	\begin{equation}
+	{}_{0}D_{t}^{\alpha} U(x,t)  = \frac{f(x)}{\alpha\Gamma(-\alpha)\cdot\Gamma(\alpha)} \cdot \frac{s^{\alpha}}{t (t-s)^{\alpha}} + {}_{s}D_{t}^{\alpha} U(x,t)
+	\end{equation}
+
+	\begin{equation}
+	{}_{0}D_{t}^{\alpha} U(x,t)  = \frac{\sin(\pi \alpha)f(x)}{- \pi t} \frac{s^{\alpha}}{(t-s)^{\alpha}} + {}_{s}D_{t}^{\alpha} U(x,t)
+	\end{equation}
+
+	\begin{equation}
+	U(x,t) = U(x;s) + V(x,t)
+	\end{equation}
+
+	\begin{equation}
+	{}_{0}D_{t}^{\alpha} U(x,t)  = \frac{\sin(\pi \alpha)f(x)}{- \pi t} \frac{s^{\alpha}}{(t-s)^{\alpha}} + {}_{s}D_{t}^{\alpha} U(x;s) + {}_{s}D_{t}^{\alpha} V(x,t)
+	\end{equation}
+
+	\begin{equation}
+	{}_{0}D_{t}^{\alpha} U(x,t)  = \frac{\sin(\pi \alpha)f(x)}{- \pi t} \frac{s^{\alpha}}{(t-s)^{\alpha}} + U(x;s) \cdot \frac{(t-s)^{-\alpha}}{\Gamma(1-\alpha)} + {}_{s}D_{t}^{\alpha} V(x,t)
+	\end{equation}
+
+	\begin{equation}
+	{}_{0}D_{t}^{\alpha} U(x,t)  = \frac{\sin(\pi \alpha)f(x)}{- \pi t} \frac{s^{\alpha}}{(t-s)^{\alpha}} + \frac{f(x)}{s} \frac{\sin(\pi \alpha)}{ \pi} \frac{s^{\alpha}}{(t-s)^{\alpha}} + {}_{s}D_{t}^{\alpha} V(x,t)
+	\end{equation}
+
+	\begin{equation}
+	{}_{0}D_{t}^{\alpha} U(x,t)  =\left(\frac{1}{s} - \frac{1}{t}\right) \frac{\sin(\pi \alpha)}{\pi} \frac{s^{\alpha}}{(t-s)^{\alpha}} f(x) + {}_{s}D_{t}^{\alpha} V(x,t)
+	\end{equation}
+
+\noindent\rule{\linewidth}{0.4pt}
+	\begin{dmath}
+	\left(\frac{1}{s} - \frac{1}{t}\right) \frac{\sin(\pi \alpha)}{\pi} \frac{s^{\alpha}}{(t-s)^{\alpha}} f(x) + {}_{s}D_{t}^{\alpha} V(x,t) + [U(x;s) + V(x,t)]\cdot {}_{0}J^{1-\alpha}_{t}(U_{x}(x;s) + V_{x}(x,t))=a \cdot (U_{xxx}(x;s) + V_{xxx}(x,t))
+	\end{dmath}
+	
+	\begin{equation}
+	Q1(x,t;s) = \left(\frac{1}{s} - \frac{1}{t}\right) \frac{\sin(\pi \alpha)}{\pi} \frac{s^{\alpha}}{(t-s)^{\alpha}} f(x)
+	\end{equation}
+
+	\begin{dmath}
+	Q1(x,t;s) + {}_{s}D_{t}^{\alpha} V(x,t) + [U(x;s) + V(x,t)]\cdot {}_{0}J^{1-\alpha}_{t}(U_{x}(x;s) + V_{x}(x,t))=a \cdot (U_{xxx}(x;s) + V_{xxx}(x,t))
+	\end{dmath}
+
+\noindent\rule{\linewidth}{0.4pt}
+	\begin{dmath}
+	{}_{0}J^{1-\alpha}_{t}(U_{x}(x;s) + V_{x}(x,t))={}_{0}J^{1-\alpha}_{t}U_{x}(x,t)
+	\end{dmath}
+	
+	\begin{equation}
+	{}_{0}J^{1-\alpha}_{t}U_{x}(x,t) = \frac{1}{\Gamma(1-\alpha)} \int_{0}^{t} \frac{U_{x}(x,\tau)}{(t-\tau)^{\alpha}}d\tau = \frac{1}{\Gamma(1-\alpha)} \int_{0}^{s} \frac{U_{x}(x,\tau)}{(t-\tau)^{\alpha}}d\tau + \frac{1}{\Gamma(1-\alpha)} \int_{s}^{t} \frac{U_{x}(x,\tau)}{(t-\tau)^{\alpha}}d\tau
+	\end{equation}
+	
+	\begin{equation}
+	{}_{0}J^{1-\alpha}_{t}U_{x}(x,t) =  \frac{1}{\Gamma(1-\alpha)} \int_{0}^{s} \frac{U_{x}(x,\tau)}{(t-\tau)^{\alpha}}d\tau + {}_{s}J^{1-\alpha}_{t}U_{x}(x,t)
+	\end{equation}
+	
+	\begin{equation}
+	{}_{0}J^{1-\alpha}_{t}U_{x}(x,t) =  \frac{1}{\Gamma(1-\alpha)} \int_{0}^{s} \frac{U_{x}(x;\tau)}{(t-\tau)^{\alpha}}d\tau + {}_{s}J^{1-\alpha}_{t}(U_{x}(x;s) + V_{x}(x,t))
+	\end{equation}
+	
+	\begin{equation}
+	{}_{0}J^{1-\alpha}_{t}U_{x}(x,t) =  \frac{f^{'}(x)}{\Gamma(\alpha)\Gamma(1-\alpha)} \int_{0}^{s} \frac{\tau^{\alpha-1}}{(t-\tau)^{\alpha}}d\tau + {}_{s}J^{1-\alpha}_{t}(U_{x}(x;s) + V_{x}(x,t))
+	\end{equation}
+	
+	\begin{equation}
+	{}_{0}J^{1-\alpha}_{t}U_{x}(x,t) =  f^{'}(x) \frac{\sin(\pi \alpha)}{\pi} \int_{0}^{s} \frac{\tau^{\alpha-1}}{(t-\tau)^{\alpha}}d\tau + {}_{s}J^{1-\alpha}_{t}(U_{x}(x;s) + V_{x}(x,t))
+	\end{equation}
+	
+	\begin{equation}
+	\int_{0}^{s} \frac{\tau^{\alpha-1}}{(t-\tau)^{\alpha}}d\tau = \frac{1}{\alpha} \frac{s^{\alpha}}{t^{\alpha}} {}_{2}F_{1}\left(\alpha, \alpha, \alpha+1, \frac{s}{t}\right)
+	\end{equation}
+
+	\begin{equation}
+	{}_{0}J^{1-\alpha}_{t}U_{x}(x,t) =  f^{'}(x) \frac{\sin(\pi \alpha)}{\pi} \frac{1}{\alpha} \frac{s^{\alpha}}{t^{\alpha}} {}_{2}F_{1}\left(\alpha, \alpha, \alpha+1, \frac{s}{t}\right) + {}_{s}J^{1-\alpha}_{t}U_{x}(x;s) +  {}_{s}J^{1-\alpha}_{t}V_{x}(x,t)
+	\end{equation}
+	
+	\begin{equation}
+	Q2(x,t;s) =  f^{'}(x) \frac{\sin(\pi \alpha)}{\pi} \frac{1}{\alpha} \frac{s^{\alpha}}{t^{\alpha}} {}_{2}F_{1}\left(\alpha, \alpha, \alpha+1, \frac{s}{t}\right)
+	\end{equation}
+	
+	\begin{equation}
+	{}_{0}J^{1-\alpha}_{t}U_{x}(x,t) =  Q2(x,t;s) + {}_{s}J^{1-\alpha}_{t}U_{x}(x;s) +  {}_{s}J^{1-\alpha}_{t}V_{x}(x,t)
+	\end{equation}
+	
+	\begin{equation}
+	{}_{0}J^{1-\alpha}_{t}U_{x}(x,t) =  Q2(x,t;s) + U_{x}(x;s)\cdot {}_{s}J^{1-\alpha}_{t}(1) +  {}_{s}J^{1-\alpha}_{t}V_{x}(x,t)
+	\end{equation}
+
+	\begin{equation}
+	{}_{0}J^{1-\alpha}_{t}U_{x}(x,t) =  Q2(x,t;s) + \frac{f^{'}(x)s^{\alpha-1}}{\Gamma(\alpha)}\cdot \frac{1}{\Gamma(1-\alpha)} \frac{(t-s)^{1-\alpha}}{1-\alpha} +  {}_{s}J^{1-\alpha}_{t}V_{x}(x,t)
+	\end{equation}
+	
+	\begin{equation}
+	{}_{0}J^{1-\alpha}_{t}U_{x}(x,t) =  Q2(x,t;s) +  f^{'}(x) \frac{\sin(\pi \alpha)}{\pi} \frac{s^{\alpha - 1}}{(t-s)^{\alpha-1}} \frac{1}{1-\alpha} +  {}_{s}J^{1-\alpha}_{t}V_{x}(x,t)
+	\end{equation}
+	
+	\begin{equation}
+	Q3(x,t;s) = f^{'}(x) \frac{\sin(\pi \alpha)}{\pi} \frac{s^{\alpha - 1}}{(t-s)^{\alpha-1}} \frac{1}{1-\alpha}
+	\end{equation}
+	
+	\begin{equation}
+	{}_{0}J^{1-\alpha}_{t}U_{x}(x,t) =  Q2(x,t;s) +  Q3(x,t;s) +  {}_{s}J^{1-\alpha}_{t}V_{x}(x,t)
+	\end{equation}
+	
+\noindent\rule{\linewidth}{0.4pt}
+	\begin{dmath}
+	Q1(x,t;s) + {}_{s}D_{t}^{\alpha} V(x,t) + [U(x;s) + V(x,t)]\cdot [ Q2(x,t;s) +  Q3(x,t;s) +  {}_{s}J^{1-\alpha}_{t}V_{x}(x,t)]=a \cdot (U_{xxx}(x;s) + V_{xxx}(x,t))
+	\end{dmath}
+	
+\end{document}
