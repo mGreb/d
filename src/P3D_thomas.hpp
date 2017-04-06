@@ -44,6 +44,7 @@ public:
 	
 	static void test_thomas_3();
 	static void test_thomas_5();
+	
 private:
 	P3D_thomas();
 	~P3D_thomas();
