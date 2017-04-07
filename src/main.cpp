@@ -198,6 +198,24 @@ double Q3
 	return funcDer1[ix] * sin_pi_alpha_pi * pow(s/ (t_steps[it] - s), alpha - 1.0) / (1.0 - alpha);
 }
 
+double I1
+	(const double t,
+	 const int    j,
+	 const int    j1)
+{
+	return   pow(t - t_steps[j1], 1.0 - alpha) / (alpha - 1.0)
+	       - pow(t - t_steps[j] , 1.0 - alpha) / (alpha - 1.0);
+}
+
+double I2
+	(const double t,
+	 const int    j,
+	 const int    j1)
+{
+	return   pow(t - t_steps[j1], 1.0 - alpha) * ((alpha - 1.0) * t_steps[j1] - (alpha - 2.0) * t_steps[j] - t) / (alpha - 1.0) / (alpha - 2)
+	       - pow(t - t_steps[j] , 1.0 - alpha) * ((alpha - 1.0) * t_steps[j]  - (alpha - 2.0) * t_steps[j] - t) / (alpha - 1.0) / (alpha - 2);
+}
+
 // dt/()
 //вычисляет интеграл
 //podstanovka - Tn
