@@ -138,6 +138,7 @@ double gamma
 	return alglib::gammafunction(input);
 }
 const double g_alpha = gamma(alpha);
+const double g_1_alpha_rev = 1.0 / gamma(1.0 - alpha);
 
 //функция - начальное условие
 double initial_condition
@@ -164,17 +165,6 @@ double initial_condition_third_derivative
 	(void)x;
 	
 	return - 6.0;
-}
-
-//функция - граничное условие
-double g
-	(const double t)
-{
-	(void)t;
-	
-	return 0.;
-	//return gamma(alpha);
-	//return 1.;
 }
 
 double Q1
@@ -216,72 +206,46 @@ double I2
 	       - pow(t - t_steps[j] , 1.0 - alpha) * ((alpha - 1.0) * t_steps[j]  - (alpha - 2.0) * t_steps[j] - t) / (alpha - 1.0) / (alpha - 2);
 }
 
-// dt/()
-//вычисляет интеграл
-//podstanovka - Tn
-//up - T(j+1)
-//down - Tj
-double newIntegral1
-	(const double podstanovka,
-	 const int    check)
+double fracIn
+	(const int    n,
+	 const int    i)
 {
 	double result = 0.0;
 	
-	if (podstanovka > check)
+	for(int j = 0; j <= n - 1; ++j)
 	{
-		result = (1.0 / (alpha - 1.0))
-		         * (  pow(s + podstanovka * dt -  check        * dt, 1.0 - alpha)
-		            - pow(s + podstanovka * dt - (check - 1.0) * dt, 1.0 - alpha));
+		result += V[j][i] * I1(t_steps[n], j, j+1) + (V[j+1][i] - V[j][i]) / dt * I2(t_steps[n], j, j+1);
 	}
 	
-	return result;
+	return g_1_alpha_rev * result;
 }
 
-// t*dt/()
-// podstanovka - Tn
-// up   - T(j+1)
-// down - Tj
-double newIntegral2
-	(const double podstanovka,
-	 const int    check)
+double fracIn1
+	(const int n,
+	 const int i)
 {
 	double result = 0.0;
 	
-	if (podstanovka > check)
+	for(int j = 1; j <= n - 1; ++j)
 	{
-		result = (1.0 / ((alpha - 2.0) * (alpha - 1.0)))
-		         * (  pow(s + podstanovka * dt - check        * dt, 1.0 - alpha) * (alpha *  check        * dt - s - podstanovka * dt -  check       * dt)
-		            - pow(s + podstanovka * dt -(check - 1.0) * dt, 1.0 - alpha) * (alpha * (check - 1.0) * dt - s - podstanovka * dt - (check - 1.0)* dt));
+		result += V[j][i] * I1(t_steps[n+1], j, j+1) + (V[j+1][i] - V[j][i]) / dt * I2(t_steps[n+1], j, j+1);
 	}
 	
-	return result;
+	return g_1_alpha_rev * result;
 }
 
-//подсчет дробного интеграла на n слое
-//down - номер временного слоя
-//order -  порядок дробного интеграла
-//step - номер шага по Ox
-double fracInt
-	(const double down,
-	 const double order,
-	 const int    step)
+double fracD
+	(const int n,
+	 const int i)
 {
-	//случай выхода за границу сетки
-	if (step >= stepAmountX)
-	{
-		return 0.;
-	}
-	
 	double result = 0.0;
 	
-	for (int j = 1; j < down; j++)
+	for(int j = 0; j <= n; ++j)
 	{
-		result += newIntegral1(n - 1.0, j + 1)
-		          * (V[j][step] + ((s + (j - 1) * dt) / dt) * (- V[j+1][step] + V[j][step]))
-		          + 1.0 / dt * newIntegral2(n - 1.0, j + 1) * (  V[j+1][step] - V[j][step]);
+		result += grunvald_coeffs[j] * V[n - j + 1][i];
 	}
 	
-	return result / gamma(order);
+	return pow(dt, - alpha) * result;
 }
 
 int main()

@@ -149,12 +149,31 @@ Explicit numerical scheme:
 	 {}_{t_{1}}J^{1-\alpha}_{t_{n+1}}V(x_{i},t)
 	 =\frac{1}{\Gamma(1-\alpha)} \left[ V_{i}^{n} I1(t_{n+1}, n, n+1) + \frac{V_{i}^{n+1} - V_{i}^{n}}{\dt} I2(t_{n+1}, n, n+1) \right] + \frac{1}{\Gamma(1-\alpha)} \sum_{j = 1}^{n-1} V_{i}^{j} I1(t_{n+1}, j, j+1) + \frac{V_{i}^{j+1} - V_{i}^{j}}{\dt} I2(t_{n+1}, j, j+1)
 	\end{dmath}
+	
+	\begin{equation}
+	fracIn1(n,i)
+	 = \frac{1}{\Gamma(1-\alpha)} \sum_{j = 1}^{n-1} V_{i}^{j} I1(t_{n+1}, j, j+1) + \frac{V_{i}^{j+1} - V_{i}^{j}}{\dt} I2(t_{n+1}, j, j+1)
+	\end{equation}
+
+	\begin{equation}
+	 {}_{t_{1}}J^{1-\alpha}_{t_{n+1}}V(x_{i},t)
+	 =\frac{1}{\Gamma(1-\alpha)} \left[ V_{i}^{n} I1(t_{n+1}, n, n+1) + \frac{V_{i}^{n+1} - V_{i}^{n}}{\dt} I2(t_{n+1}, n, n+1) \right] + fracIn1(n,i)
+	\end{equation}
 
 \noindent\rule{\linewidth}{0.4pt}
-Implicit numerical scheme:
-
 	\begin{dmath}
 	Q1(x_{i},t_{n+1};s) + \dt^{-\alpha} V_{i}^{n+1} + \dt^{-\alpha} \sum_{j = 1}^{n} (-1)^{j} \binom{\alpha}{j} V_{i}^{n-j+1}
+	+ \frac{1}{2}[U(x_{i};s) + V_{i}^{n+1}]\cdot [ Q2(x_{i},t_{n};s) +  Q3(x_{i},t_{n};s) + \frac{1}{\dx} {}_{t_{1}}J^{1-\alpha}_{t_{n}}\{V_{i+1} - V_{i-1}\}]
+	+ \frac{1}{2}[U(x_{i};s) + V_{i}^{n}]\cdot [ Q2(x_{i},t_{n+1};s) +  Q3(x_{i},t_{n+1};s) + \frac{1}{\dx} {}_{t_{1}}J^{1-\alpha}_{t_{n+1}}\{V_{i+1} - V_{i-1}\}]=a \cdot (U_{xxx}(x_{i};s) + V_{xxx}(x_{i},t_{n+1}))
+	\end{dmath}
+	
+	\begin{equation}
+	D1(n,i) = \dt^{-\alpha} \sum_{j = 1}^{n} (-1)^{j} \binom{\alpha}{j} V_{i}^{n-j+1}
+	\end{equation}
+\noindent\rule{\linewidth}{0.4pt}
+Implicit numerical scheme:
+	\begin{dmath}
+	Q1(x_{i},t_{n+1};s) + \dt^{-\alpha} V_{i}^{n+1} + D1(n,i)
 	+ \frac{1}{2}[U(x_{i};s) + V_{i}^{n+1}]\cdot [ Q2(x_{i},t_{n};s) +  Q3(x_{i},t_{n};s) + \frac{1}{\dx} {}_{t_{1}}J^{1-\alpha}_{t_{n}}\{V_{i+1} - V_{i-1}\}]
 	+ \frac{1}{2}[U(x_{i};s) + V_{i}^{n}]\cdot [ Q2(x_{i},t_{n+1};s) +  Q3(x_{i},t_{n+1};s) + \frac{1}{\dx} {}_{t_{1}}J^{1-\alpha}_{t_{n+1}}\{V_{i+1} - V_{i-1}\}]=a \cdot (U_{xxx}(x_{i};s) + V_{xxx}(x_{i},t_{n+1}))
 	\end{dmath}
