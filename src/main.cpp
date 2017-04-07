@@ -11,6 +11,10 @@
 // User includes
 #include "P3D_thomas.hpp"
 
+// Дебажный макрос
+#define SHOW_N(a) std::cout << "|---DEBUG---| " << #a << ": " << (a) << std::endl
+#define SHOW(a) std::cout << "|---DEBUG---| " << #a << ": " << (a) << " "
+
 using std::cout;
 using std::endl;
 
@@ -22,12 +26,10 @@ const int end_point = 1;  // правый край отрезка по x
 const int start_time = 0;  // начальное время t
 const int end_time = 1;  // конечное время t
 
-int n = 0;  // номер слоя по времени
-
 const double alpha = 0.5;  // задайте альфа на полуинтервале (0;1]
 const double dx = 0.01;  // шаг по х
 const double dt = 0.01; // * pow(dx, 3.0 / alpha) / rhs_coeff;  // шаг по времени
-const double s = 0.01;  // самая первая ступенька (тесная зависимость с alpha, по какой формуле?)
+const double s = 0.001;  // самая первая ступенька (тесная зависимость с alpha, по какой формуле?)
 
 const int stepAmountX = int((end_point - start_point) / dx + 1);  // количество точек по пространству
 const int stepAmountT = int((end_time - start_time) / dt + 1);  // полные временные слои
@@ -37,8 +39,6 @@ const int time_steps_to_count = 1000 < stepAmountT ? 1000 : stepAmountT;  // ч�
 const int threadNum = 1;  // number of threads for openmp
 
 const int sums_hyper = 20;  // кол-во слагаемых для гипергеометрической функции
-
-const double sin_pi_alpha_pi = sin(M_PI * alpha) / M_PI;
 
 // массивы для прогонки ------------------------------------------------------------------------------------------------
 std::vector<double> A((size_t)stepAmountX);  // Под-под-диагональ
@@ -60,7 +60,8 @@ std::array<std::array<double, stepAmountX>, time_steps_to_count> V;  // Масс
 std::array<double, stepAmountX> x_steps;          // Массив шагов по пространству
 std::array<double, time_steps_to_count> t_steps;  // Массив шагов по времени
 
-std::array<double, stepAmountX> Us;  // Массив значений функции сдвига
+std::array<double, stepAmountX> Uxs;  // Массив значений функции сдвига
+std::array<double, stepAmountX> UxsDer3;  // Массив третьих производных значений функции сдвига
 
 std::array<double, time_steps_to_count> grunvald_coeffs;  // массив коэффициентов Грюнвальда-Летникова
 std::vector<double> hyper_func;  // Массив значений гипергеометрической функции 2F1(alpha, alpha, alpha + 1, s / t)
@@ -137,8 +138,6 @@ double gamma
 {
 	return alglib::gammafunction(input);
 }
-const double g_alpha = gamma(alpha);
-const double g_1_alpha_rev = 1.0 / gamma(1.0 - alpha);
 
 //функция - начальное условие
 double initial_condition
@@ -167,25 +166,34 @@ double initial_condition_third_derivative
 	return - 6.0;
 }
 
-double Q1
-	(const int it,
-	 const int ix)
+namespace useful_const
 {
-	return (1.0 / s - 1 / t_steps[it]) * sin_pi_alpha_pi * pow(s / (t_steps[it] - s), alpha) * func[ix];
+	const double g_alpha = gamma(alpha);
+	const double g_1_alpha_rev = 1.0 / gamma(1.0 - alpha);
+	const double sin_pi_alpha_pi = sin(M_PI * alpha) / M_PI;
+	const double dx3 = dx * dx * dx;
+	const double dt_m_alpha = pow(dt, - alpha);
+}
+
+double Q1
+	(const int    it,
+	 const size_t ix)
+{
+	return (1.0 / s - 1 / t_steps[it]) * useful_const::sin_pi_alpha_pi * pow(s / (t_steps[it] - s), alpha) * func[ix];
 }
 
 double Q2
-	(const int it,
-	 const int ix)
+	(const int    it,
+	 const size_t ix)
 {
-	return funcDer1[ix] * sin_pi_alpha_pi / alpha * pow(s / t_steps[it], alpha) * hyper_func[it];
+	return funcDer1[ix] * useful_const::sin_pi_alpha_pi / alpha * pow(s / t_steps[it], alpha) * hyper_func[it];
 }
 
 double Q3
-	(const int it,
-	 const double ix)
+	(const int    it,
+	 const size_t ix)
 {
-	return funcDer1[ix] * sin_pi_alpha_pi * pow(s/ (t_steps[it] - s), alpha - 1.0) / (1.0 - alpha);
+	return funcDer1[ix] * useful_const::sin_pi_alpha_pi * pow(s/ (t_steps[it] - s), alpha - 1.0) / (1.0 - alpha);
 }
 
 double I1
@@ -208,7 +216,7 @@ double I2
 
 double fracIn
 	(const int    n,
-	 const int    i)
+	 const size_t i)
 {
 	double result = 0.0;
 	
@@ -217,7 +225,7 @@ double fracIn
 		result += V[j][i] * I1(t_steps[n], j, j+1) + (V[j+1][i] - V[j][i]) / dt * I2(t_steps[n], j, j+1);
 	}
 	
-	return g_1_alpha_rev * result;
+	return useful_const::g_1_alpha_rev * result;
 }
 
 double fracIn1
@@ -231,12 +239,12 @@ double fracIn1
 		result += V[j][i] * I1(t_steps[n+1], j, j+1) + (V[j+1][i] - V[j][i]) / dt * I2(t_steps[n+1], j, j+1);
 	}
 	
-	return g_1_alpha_rev * result;
+	return useful_const::g_1_alpha_rev * result;
 }
 
 double fracD
-	(const int n,
-	 const int i)
+	(const int    n,
+	 const size_t i)
 {
 	double result = 0.0;
 	
@@ -245,7 +253,7 @@ double fracD
 		result += grunvald_coeffs[j] * V[n - j + 1][i];
 	}
 	
-	return pow(dt, - alpha) * result;
+	return useful_const::dt_m_alpha * result;
 }
 
 int main()
@@ -269,9 +277,9 @@ int main()
 		x_steps[i] = i * dx;
 	}
 	
-	t_steps[0] = 0;
-	t_steps[1] = s;
-	for(size_t i = 2; i < t_steps.size(); ++i)
+	// t_steps[0] = 0;
+	t_steps[0] = s;
+	for(size_t i = 1; i < t_steps.size(); ++i)
 	{
 		t_steps[i] = s + (i - 1) * dt;
 	}
@@ -284,9 +292,10 @@ int main()
 		funcDer3[i] = initial_condition_third_derivative(x_steps[i]);
 	}
 	
-	for (size_t i = 0; i < Us.size(); ++i)
+	for (size_t i = 0; i < Uxs.size(); ++i)
 	{
-		Us[i] = func[i] * pow(s, alpha - 1.0) / g_alpha;
+		Uxs[i]     = func[i]     * pow(s, alpha - 1.0) / useful_const::g_alpha;
+		UxsDer3[i] = funcDer3[i] * pow(s, alpha - 1.0) / useful_const::g_alpha;
 	}
 	
 	grunvald_coeffs[0] = pow(-1.0, 0.0) * 1.0;
@@ -303,13 +312,37 @@ int main()
 	}
 	// -------------------------------------------------------------------------------------------------------------------
 	
+	// it - номер слоя который вычисляем
+	for(int it = 1; it < time_steps_to_count; ++it)
+	{
+		// отступаю с краев по две ячейки, так как производная третьего порядка
+		for(size_t ix = 2; ix < x_steps.size() - 2; ++ix)
+		{
+			const double Vder3 = (V.at(it).at(ix+2) - 2.0 * V[it][ix+1] + 2.0 * V[it][ix-1] - V[it][ix-2]) / useful_const::dx3;
+			
+			V[it+1][ix] = - Q1(it, ix) - fracD(it, ix)
+			              - (Uxs[ix] + V[it][ix]) * (Q2(it, ix) + Q3(it, ix) + 1.0 / dx * (fracIn(it, ix + 1) - fracIn(it, ix - 1)))
+			              + rhs_coeff * (UxsDer3[ix] + Vder3);
+			V[it+1][ix] *= 1.0 / useful_const::dt_m_alpha;
+			
+			SHOW(it); SHOW(ix); SHOW(V[it+1][ix]); SHOW(Vder3); SHOW(Q1(it, ix)); SHOW(fracD(it, ix)); SHOW_N(1);
+			getchar();
+		}
+		
+		// условия нулевого градиента слева и справа
+		V[it][0] = V[it][2];
+		V[it][1] = V[it][2];
+		
+		V[it][stepAmountX - 1] = V[it][stepAmountX - 3];
+		V[it][stepAmountX - 2] = V[it][stepAmountX - 3];
+	}
 	
 	// Выполняю обратную подстановку -------------------------------------------------------------------------------------
 	for (size_t l = 0; l < V.size(); ++l)
 	{
 		for (size_t p = 0; p < V[l].size(); ++p)
 		{
-			V[l][p] = V[l][p] + Us[p];
+			V[l][p] = V[l][p] + Uxs[p];
 		}
 	}
 	// -------------------------------------------------------------------------------------------------------------------
