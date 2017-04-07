@@ -157,7 +157,7 @@ void P3D::P3D_thomas::test_thomas_5()
 	printf("Eps: %lf\n", eps3);
 	printf("Eps: %lf\n", eps4);
 	
-	for(int j = 0; j < size; ++j)
+	for(size_t j = 0; j < size; ++j)
 	{
 		printf("Res: %lf\n", result[j]);
 	}
