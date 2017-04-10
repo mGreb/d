@@ -18,7 +18,7 @@
 using std::cout;
 using std::endl;
 
-const int rhs_coeff = 1;  // коэффициент при правой части
+const double rhs_coeff = 0.1;  // коэффициент при правой части
 
 const int start_point = 0;  // левый край отрезка по x
 const int end_point = 1;  // правый край отрезка по x
@@ -34,11 +34,16 @@ const double s = 0.001;  // самая первая ступенька (тесн
 const int stepAmountX = int((end_point - start_point) / dx + 1);  // количество точек по пространству
 const int stepAmountT = int((end_time - start_time) / dt + 1);  // полные временные слои
 
-const int time_steps_to_count = 21500; // < stepAmountT ? 1000 : stepAmountT;  // число временных слоев необходимых для вычисления
+// const int time_steps_to_count = 2000;  // число временных слоев необходимых для вычисления
+const int time_steps_to_count = stepAmountT;  // число временных слоев необходимых для вычисления
 
-const int threadNum = 2;  // number of threads for openmp
+const int threadNum = 8;  // number of threads for openmp
 
 const int sums_hyper = 20;  // кол-во слагаемых для гипергеометрической функции
+
+const int output_step = 1;
+
+const int number_of_explicit_steps = 2;
 
 // массивы для прогонки ------------------------------------------------------------------------------------------------
 std::vector<double> A((size_t)stepAmountX);  // Под-под-диагональ
@@ -73,7 +78,7 @@ void toFile
 	{
 		std::fstream str;
 		str.open("out.txt", std::ios::out);
-		for(size_t n = 0; n < t_steps.size(); n += 10)// ++n)
+		for(size_t n = 0; n < t_steps.size(); n += output_step)
 		{
 			str << "#" << n << std::endl;  // для gnuplot
 			for(size_t i = 0; i < x_steps.size(); ++i)
@@ -276,8 +281,6 @@ int main()
 		x_steps[i] = i * dx;
 	}
 	
-	// t_steps[0] = 0;
-	//t_steps[0] = s;
 	for(size_t i = 0; i < t_steps.size(); ++i)
 	{
 		t_steps[i] = s + i * dt;
@@ -299,7 +302,7 @@ int main()
 	
 	grunvald_coeffs[0] = pow(-1.0, 0.0) * 1.0;
 	grunvald_coeffs[1] = pow(-1.0, 1.0) * alpha;
-	for (size_t i = 2; i < grunvald_coeffs.size(); i++)
+	for (size_t i = 2; i < grunvald_coeffs.size(); ++i)
 	{
 		grunvald_coeffs[i] = pow(-1.0, i) * grunvald_coeffs[i - 1] * (alpha - i + 1.0) / i;
 	}
@@ -311,8 +314,9 @@ int main()
 	}
 	// -------------------------------------------------------------------------------------------------------------------
 	
+	// Шагаю явной схемой ------------------------------------------------------------------------------------------------
 	// it - номер слоя который вычисляем
-	for(int it = 1; it < time_steps_to_count - 1; ++it)
+	for(int it = 1; it < number_of_explicit_steps; ++it)
 	{
 		// отступаю с краев по две ячейки, так как производная третьего порядка
 #pragma omp parallel for
@@ -332,10 +336,19 @@ int main()
 		// условия нулевого градиента слева и справа
 		V[it+1][0] = V[it+1][2];
 		V[it+1][1] = V[it+1][2];
-		
 		V[it+1][stepAmountX - 1] = V[it+1][stepAmountX - 3];
 		V[it+1][stepAmountX - 2] = V[it+1][stepAmountX - 3];
 	}
+	// -------------------------------------------------------------------------------------------------------------------
+	
+	// Вычисление неявной схемой -----------------------------------------------------------------------------------------
+	for(int i = number_of_explicit_steps; i < time_steps_to_count; ++i)
+	{
+		
+		
+		P3D::P3D_thomas::thomas(A, B, C, D, E, F, X);
+	}
+	// -------------------------------------------------------------------------------------------------------------------
 	
 	// Выполняю обратную подстановку -------------------------------------------------------------------------------------
 	for (size_t l = 0; l < V.size(); ++l)
@@ -352,9 +365,6 @@ int main()
 	const double end = omp_get_wtime();
 	const double total_time = end - start;
 	cout << "time = " << total_time << " seconds\n";
-	
-	system("gnuplot ./gnuplot/testOMP.plt");
-	system("gnuplot ./gnuplot/plot.plt");
 	
 	return 0;
 }

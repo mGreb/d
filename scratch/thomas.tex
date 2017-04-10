@@ -1,0 +1,63 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[left=1cm, right=1cm, top=1cm, bottom=1.5cm, bindingoffset=0cm]{geometry}
+\usepackage{breqn}
+
+\newcommand {\partt} {\frac{\partial}{\partial t}}
+\newcommand{\Uxs}[1]{ \frac{f(x)\cdot{#1}^{\alpha-1}}{\Gamma(\alpha)}}
+\newcommand {\dt} {\Delta t}
+\newcommand {\dx} {\Delta x}
+
+\begin{document}
+Making matrix for thomas algorithm:
+	\begin{dmath}
+	Q1(x_{i},t_{n+1};s) + \dt^{-\alpha} V_{i}^{n+1} + D1(n,i)
+	+ \frac{1}{2}[U(x_{i};s) + V_{i}^{n+1}]\cdot [ Q2(x_{i},t_{n};s) +  Q3(x_{i},t_{n};s) + \frac{1}{2\dx} {}_{t_{1}}J^{1-\alpha}_{t_{n}}\{V_{i+1} - V_{i-1}\}]
+	+ \frac{1}{2}[U(x_{i};s) + V_{i}^{n}]\cdot [ Q2(x_{i},t_{n+1};s) +  Q3(x_{i},t_{n+1};s) + \frac{1}{2\dx} {}_{t_{1}}J^{1-\alpha}_{t_{n+1}}\{V_{i+1} - V_{i-1}\}]=a \cdot (U_{xxx}(x_{i};s) + V_{xxx}(x_{i},t_{n+1}))
+	\end{dmath}
+
+	\begin{equation}
+	 {}_{t_{1}}J^{1-\alpha}_{t_{n+1}}V(x_{i},t)
+	 =\frac{1}{\Gamma(1-\alpha)} \left[ V_{i}^{n} I1(t_{n+1}, n, n+1) + \frac{V_{i}^{n+1} - V_{i}^{n}}{\dt} I2(t_{n+1}, n, n+1) \right] + fracIn1(n,i)
+	\end{equation}
+
+	\begin{equation}
+	fracIn1(n,i)
+	 = \frac{1}{\Gamma(1-\alpha)} \sum_{j = 1}^{n-1} V_{i}^{j} I1(t_{n+1}, j, j+1) + \frac{V_{i}^{j+1} - V_{i}^{j}}{\dt} I2(t_{n+1}, j, j+1)
+	\end{equation}
+
+	\begin{dmath}
+	 {}_{t_{1}}J^{1-\alpha}_{t_{n+1}}V(x_{i},t)
+	 =\frac{1}{\Gamma(1-\alpha)} V_{i}^{n} I1(t_{n+1}, n, n+1) +\frac{1}{\Gamma(1-\alpha)\dt} V_{i}^{n+1}I2(t_{n+1}, n, n+1) -\frac{1}{\Gamma(1-\alpha)\dt}  V_{i}^{n} I2(t_{n+1}, n, n+1) + fracIn1(n,i)
+	\end{dmath}
+
+\noindent\rule{\linewidth}{0.4pt}
+	\begin{dmath}
+                 \frac{1}{4 \dx}[U(x_{i};s) + V_{i}^{n}]\cdot \left(\frac{1}{\Gamma(1-\alpha)} V_{i+1}^{n} I1(t_{n+1}, n, n+1) +\frac{1}{\Gamma(1-\alpha)\dt} V_{i+1}^{n+1}I2(t_{n+1}, n, n+1) -\frac{1}{\Gamma(1-\alpha)\dt}  V_{i+1}^{n} I2(t_{n+1}, n, n+1) + fracIn1(n,i+1)\right)
+                 \\ - \frac{1}{4 \dx}[U(x_{i};s) + V_{i}^{n}]\cdot \left(\frac{1}{\Gamma(1-\alpha)} V_{i-1}^{n} I1(t_{n+1}, n, n+1) +\frac{1}{\Gamma(1-\alpha)\dt} V_{i-1}^{n+1}I2(t_{n+1}, n, n+1) -\frac{1}{\Gamma(1-\alpha)\dt}  V_{i-1}^{n} I2(t_{n+1}, n, n+1) + fracIn1(n,i-1)\right) =   0
+	\end{dmath}
+
+	\begin{dmath}
+	A^{n+1}_{i-2}: + \frac{a}{\dx^{3}}
+	\end{dmath}
+	
+	\begin{dmath}
+	B^{n+1}_{i-1}: - 2\frac{a}{\dx^{3}}
+	\end{dmath}
+	
+	\begin{dmath}
+	C^{n+1}_{i}: \dt^{-\alpha} + \frac{1}{2}\cdot [ Q2(x_{i},t_{n};s) +  Q3(x_{i},t_{n};s) + \frac{1}{2\dx} {}_{t_{1}}J^{1-\alpha}_{t_{n}}\{V_{i+1} - V_{i-1}\}]
+	\end{dmath}
+	
+	\begin{dmath}
+	D^{n+1}_{i+1}: + 2\frac{a}{\dx^{3}}
+	\end{dmath}
+	
+	\begin{dmath}
+	E^{n+1}_{i+2}: - \frac{a}{\dx^{3}}
+	\end{dmath}
+	
+	\begin{dmath}
+	F: - Q1(x_{i},t_{n+1};s) - D1(n,i) + a \cdot U_{xxx}(x_{i};s) - \frac{1}{2}[U(x_{i};s)]\cdot [ Q2(x_{i},t_{n};s) +  Q3(x_{i},t_{n};s) + \frac{1}{2\dx} {}_{t_{1}}J^{1-\alpha}_{t_{n}}\{V_{i+1} - V_{i-1}\}] - \frac{1}{2}[U(x_{i};s) + V_{i}^{n}]\cdot [ Q2(x_{i},t_{n+1};s) +  Q3(x_{i},t_{n+1};s)] 
+	\end{dmath}
+
+\end{document}
