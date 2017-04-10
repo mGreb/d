@@ -12,8 +12,8 @@
 #include "P3D_thomas.hpp"
 
 // Дебажный макрос
-#define SHOW_N(a) std::cout << "|---DEBUG---| " << #a << ": " << (a) << std::endl
-#define SHOW(a) std::cout << "|---DEBUG---| " << #a << ": " << (a) << " "
+#define SHOW_N(a) std::cout << #a << ": " << (a) << std::endl
+#define SHOW(a) std::cout << #a << ": " << (a) << " "
 
 using std::cout;
 using std::endl;
@@ -26,17 +26,17 @@ const int end_point = 1;  // правый край отрезка по x
 const int start_time = 0;  // начальное время t
 const int end_time = 1;  // конечное время t
 
-const double alpha = 0.5;  // задайте альфа на полуинтервале (0;1]
-const double dx = 0.01;  // шаг по х
-const double dt = 0.01; // * pow(dx, 3.0 / alpha) / rhs_coeff;  // шаг по времени
+const double alpha = 0.9;  // задайте альфа на полуинтервале (0;1]
+const double dx = 0.1;  // шаг по х
+const double dt = 0.1 * pow(dx, 3.0 / alpha) / rhs_coeff;  // шаг по времени
 const double s = 0.001;  // самая первая ступенька (тесная зависимость с alpha, по какой формуле?)
 
 const int stepAmountX = int((end_point - start_point) / dx + 1);  // количество точек по пространству
 const int stepAmountT = int((end_time - start_time) / dt + 1);  // полные временные слои
 
-const int time_steps_to_count = 1000 < stepAmountT ? 1000 : stepAmountT;  // число временных слоев необходимых для вычисления
+const int time_steps_to_count = 21500; // < stepAmountT ? 1000 : stepAmountT;  // число временных слоев необходимых для вычисления
 
-const int threadNum = 1;  // number of threads for openmp
+const int threadNum = 2;  // number of threads for openmp
 
 const int sums_hyper = 20;  // кол-во слагаемых для гипергеометрической функции
 
@@ -50,15 +50,15 @@ std::vector<double> F((size_t)stepAmountX);  // Здесь правая част
 std::vector<double> X((size_t)stepAmountX);  // Решение
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::array<double, stepAmountX> func;      // Массив значений функции начального условия
-std::array<double, stepAmountX> funcDer1;  // 1 производная функции начального условия
-std::array<double, stepAmountX> funcDer2;  // 2 производная функции начального условия
-std::array<double, stepAmountX> funcDer3;  // 3 производная функции начального условия
+std::vector<double> func((size_t)stepAmountX);      // Массив значений функции начального условия
+std::vector<double> funcDer1((size_t)stepAmountX);  // 1 производная функции начального условия
+std::vector<double> funcDer2((size_t)stepAmountX);  // 2 производная функции начального условия
+std::vector<double> funcDer3((size_t)stepAmountX);  // 3 производная функции начального условия
 
 std::array<std::array<double, stepAmountX>, time_steps_to_count> V;  // Массив для значений сеточной функции
 
-std::array<double, stepAmountX> x_steps;          // Массив шагов по пространству
-std::array<double, time_steps_to_count> t_steps;  // Массив шагов по времени
+std::vector<double> x_steps((size_t)stepAmountX);          // Массив шагов по пространству
+std::vector<double> t_steps((size_t)time_steps_to_count);  // Массив шагов по времени
 
 std::array<double, stepAmountX> Uxs;  // Массив значений функции сдвига
 std::array<double, stepAmountX> UxsDer3;  // Массив третьих производных значений функции сдвига
@@ -73,8 +73,7 @@ void toFile
 	{
 		std::fstream str;
 		str.open("out.txt", std::ios::out);
-		//for(int n=0;n<t;n+=49)	//для вывода малого количества графиков (чтобы не захламлять графиками картинку)
-		for(size_t n = 0; n < t_steps.size(); ++n)
+		for(size_t n = 0; n < t_steps.size(); n += 10)// ++n)
 		{
 			str << "#" << n << std::endl;  // для gnuplot
 			for(size_t i = 0; i < x_steps.size(); ++i)
@@ -186,7 +185,7 @@ double Q2
 	(const int    it,
 	 const size_t ix)
 {
-	return funcDer1[ix] * useful_const::sin_pi_alpha_pi / alpha * pow(s / t_steps[it], alpha) * hyper_func[it];
+	return funcDer1[ix] * useful_const::sin_pi_alpha_pi / alpha * pow(s / t_steps[it], alpha) * hyper_geometric(alpha, alpha, alpha + 1.0, s / t_steps[it]);  // hyper_func[it];
 }
 
 double Q3
@@ -248,7 +247,7 @@ double fracD
 {
 	double result = 0.0;
 	
-	for(int j = 0; j <= n; ++j)
+	for(int j = 1; j <= n; ++j)
 	{
 		result += grunvald_coeffs[j] * V[n - j + 1][i];
 	}
@@ -263,7 +262,7 @@ int main()
 	// переменные для подсчета потраченного времени
 	const double start = omp_get_wtime();
 	
-	cout.precision(15);
+	cout.precision(5);
 	cout << "Number of threads: " << threadNum << endl;
 	cout << "dt: " << dt << endl;
 	cout << "dx: " << dx << endl;
@@ -278,10 +277,10 @@ int main()
 	}
 	
 	// t_steps[0] = 0;
-	t_steps[0] = s;
-	for(size_t i = 1; i < t_steps.size(); ++i)
+	//t_steps[0] = s;
+	for(size_t i = 0; i < t_steps.size(); ++i)
 	{
-		t_steps[i] = s + (i - 1) * dt;
+		t_steps[i] = s + i * dt;
 	}
 	
 	for (size_t i = 0; i < func.size(); ++i)
@@ -313,28 +312,29 @@ int main()
 	// -------------------------------------------------------------------------------------------------------------------
 	
 	// it - номер слоя который вычисляем
-	for(int it = 1; it < time_steps_to_count; ++it)
+	for(int it = 1; it < time_steps_to_count - 1; ++it)
 	{
 		// отступаю с краев по две ячейки, так как производная третьего порядка
+#pragma omp parallel for
 		for(size_t ix = 2; ix < x_steps.size() - 2; ++ix)
 		{
-			const double Vder3 = (V.at(it).at(ix+2) - 2.0 * V[it][ix+1] + 2.0 * V[it][ix-1] - V[it][ix-2]) / useful_const::dx3;
+			const double Vder3 = (V[it][ix+2] - 2.0 * V[it][ix+1] + 2.0 * V[it][ix-1] - V[it][ix-2]) / useful_const::dx3;
 			
 			V[it+1][ix] = - Q1(it, ix) - fracD(it, ix)
-			              - (Uxs[ix] + V[it][ix]) * (Q2(it, ix) + Q3(it, ix) + 1.0 / dx * (fracIn(it, ix + 1) - fracIn(it, ix - 1)))
+			              - (Uxs[ix] + V[it][ix]) * (Q2(it, ix) + Q3(it, ix) + 0.5 / dx * (fracIn(it, ix + 1) - fracIn(it, ix - 1)))
 			              + rhs_coeff * (UxsDer3[ix] + Vder3);
 			V[it+1][ix] *= 1.0 / useful_const::dt_m_alpha;
 			
-			SHOW(it); SHOW(ix); SHOW(V[it+1][ix]); SHOW(Vder3); SHOW(Q1(it, ix)); SHOW(fracD(it, ix)); SHOW_N(1);
-			getchar();
+//			SHOW(it); SHOW(ix); SHOW(V[it+1][ix]); SHOW(Vder3); SHOW(Q1(it, ix)); SHOW(fracD(it, ix)); SHOW(Q2(it, ix)); SHOW(Q3(it, ix)); SHOW(fracIn(it, ix + 1)); SHOW(fracIn(it, ix - 1));
+//			getchar();
 		}
 		
 		// условия нулевого градиента слева и справа
-		V[it][0] = V[it][2];
-		V[it][1] = V[it][2];
+		V[it+1][0] = V[it+1][2];
+		V[it+1][1] = V[it+1][2];
 		
-		V[it][stepAmountX - 1] = V[it][stepAmountX - 3];
-		V[it][stepAmountX - 2] = V[it][stepAmountX - 3];
+		V[it+1][stepAmountX - 1] = V[it+1][stepAmountX - 3];
+		V[it+1][stepAmountX - 2] = V[it+1][stepAmountX - 3];
 	}
 	
 	// Выполняю обратную подстановку -------------------------------------------------------------------------------------
