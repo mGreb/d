@@ -10,23 +10,17 @@
 % \title - paper title
 % \authors - authors list
 
-\title{Guidelines for the authors of the PCT conference\\
-for formatting of full and short papers \\
-(\LaTeX document)\footnote{Gratitude and references to the grant are made out as a footnote to the title of the paper.}}
+\title{Parallel algorithm for solving initial boundary value problem for time-fractional Korteweg-de Vries equation}
 
-\authors{A.B.~First\superscript{1}, C.D.~Second\superscript{1}, E.F.~Third\superscript{2}}
-\organizations{OrganisationA\superscript{1}, OrganisationB\superscript{2}}
+\authors{M.S.~Grebelnick\superscript{1}, S.Yu.~Lukashchuk\superscript{1}}
+\organizations{Ufa State Aviation Technical University\superscript{1}}
 
 % abstract is contained in the  abstract environment 
 \begin{abstract}
-Abstract contains a brief description of the paper, it should not exceed 10~lines. 
-Abstract is separated by a single blank line with 16~pt size above and below. 
-Left and right margins are of 15~mm width. Abstract is formatted as justified text 
-with 10~pt Times New Roman font. This text is formatted according to all requirements 
-and can be used as a template.
+We consider the problem of numerical solution to the initial boundary value problem for a fractional generalization of the Korteweg-de Vries equation with the Riemann-Liouville time-fractional derivative. The presence of a fractional derivative leads to a linear increasing computational cost as the number of time step increases. As a result, solving even a relatively simple one-dimensional problem requires very considerable computational resources, which leads to the necessity for developing parallel algorithms for its solving. We present a numerical scheme for solving the problem and an algorithm for its parallelization, as well as an estimation of its efficiency. The proposed approach is justified by the results of computational experiments performed on computing systems with shared memory.
 \end{abstract}
 
-\keywords{from 3 to 10 key words and (or) the phrases separated by commas should be specified here.}
+\keywords{fractional derivative, fractional differential equation, numerical scheme, parallel algorithm, efficiency}
 
 % \section{title} - the header is the first level section
 % \subsection{title} - the header is the second level section
@@ -143,7 +137,7 @@ Reference list is numbered in Arabic numerals with font of 11~pt and with left-a
 
 \begin{biblio}
 
-\bibitem{stonebraker}
+\bibitem{samko}
 Stonebraker M., Kemnitz G. The POSTGRES Next-generation Database Management System // Communications of the ACM. 1991. Vol. 34, No. 10. P. 78--92.
 
 \bibitem{yao}
