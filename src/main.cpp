@@ -18,7 +18,7 @@
 using std::cout;
 using std::endl;
 
-const double rhs_coeff = 0.1;  // коэффициент при правой части
+const double rhs_coeff = 1.0;  // коэффициент при правой части
 
 const int start_point = 0;  // левый край отрезка по x
 const int end_point = 1;  // правый край отрезка по x
@@ -34,8 +34,8 @@ const double s = 0.001;  // самая первая ступенька (тесн
 const int stepAmountX = int((end_point - start_point) / dx + 1);  // количество точек по пространству
 const int stepAmountT = int((end_time - start_time) / dt + 1);  // полные временные слои
 
-// const int time_steps_to_count = 2000;  // число временных слоев необходимых для вычисления
-const int time_steps_to_count = stepAmountT;  // число временных слоев необходимых для вычисления
+const int time_steps_to_count = 1000;  // число временных слоев необходимых для вычисления
+//const int time_steps_to_count = stepAmountT;  // число временных слоев необходимых для вычисления
 
 const int threadNum = 8;  // number of threads for openmp
 
@@ -43,7 +43,7 @@ const int sums_hyper = 20;  // кол-во слагаемых для гипер�
 
 const int output_step = 1;
 
-const int number_of_explicit_steps = 2;
+const int number_of_explicit_steps = time_steps_to_count - 1;
 
 // массивы для прогонки ------------------------------------------------------------------------------------------------
 std::vector<double> A((size_t)stepAmountX);  // Под-под-диагональ
@@ -183,21 +183,21 @@ double Q1
 	(const int    it,
 	 const size_t ix)
 {
-	return (1.0 / s - 1 / t_steps[it]) * useful_const::sin_pi_alpha_pi * pow(s / (t_steps[it] - s), alpha) * func[ix];
+	return (1.0 / s - 1.0 / t_steps[it]) * useful_const::sin_pi_alpha_pi * pow(s / (t_steps[it] - s), alpha) * func[ix];
 }
 
 double Q2
 	(const int    it,
 	 const size_t ix)
 {
-	return funcDer1[ix] * useful_const::sin_pi_alpha_pi / alpha * pow(s / t_steps[it], alpha) * hyper_geometric(alpha, alpha, alpha + 1.0, s / t_steps[it]);  // hyper_func[it];
+	return funcDer1[ix] * useful_const::sin_pi_alpha_pi / alpha * pow(s / t_steps[it], alpha) * hyper_geometric(alpha, alpha, alpha + 1.0, s / t_steps[it]);
 }
 
 double Q3
 	(const int    it,
 	 const size_t ix)
 {
-	return funcDer1[ix] * useful_const::sin_pi_alpha_pi * pow(s/ (t_steps[it] - s), alpha - 1.0) / (1.0 - alpha);
+	return funcDer1[ix] * useful_const::sin_pi_alpha_pi * pow(s / (t_steps[it] - s), alpha - 1.0) / (1.0 - alpha);
 }
 
 double I1
@@ -214,8 +214,8 @@ double I2
 	 const int    j,
 	 const int    j1)
 {
-	return   pow(t - t_steps[j1], 1.0 - alpha) * ((alpha - 1.0) * t_steps[j1] - (alpha - 2.0) * t_steps[j] - t) / (alpha - 1.0) / (alpha - 2)
-	       - pow(t - t_steps[j] , 1.0 - alpha) * ((alpha - 1.0) * t_steps[j]  - (alpha - 2.0) * t_steps[j] - t) / (alpha - 1.0) / (alpha - 2);
+	return   pow(t - t_steps[j1], 1.0 - alpha) * ((alpha - 1.0) * t_steps[j1] - (alpha - 2.0) * t_steps[j] - t) / (alpha - 1.0) / (alpha - 2.0)
+	       - pow(t - t_steps[j] , 1.0 - alpha) * ((alpha - 1.0) * t_steps[j]  - (alpha - 2.0) * t_steps[j] - t) / (alpha - 1.0) / (alpha - 2.0);
 }
 
 double fracIn
@@ -224,7 +224,7 @@ double fracIn
 {
 	double result = 0.0;
 	
-	for(int j = 0; j <= n - 1; ++j)
+	for(int j = 1; j <= n - 1; ++j)
 	{
 		result += V[j][i] * I1(t_steps[n], j, j+1) + (V[j+1][i] - V[j][i]) / dt * I2(t_steps[n], j, j+1);
 	}
@@ -251,8 +251,7 @@ double fracD
 	 const size_t i)
 {
 	double result = 0.0;
-	
-	for(int j = 1; j <= n; ++j)
+	for(int j = 1; j < n; ++j)
 	{
 		result += grunvald_coeffs[j] * V[n - j + 1][i];
 	}
@@ -300,11 +299,15 @@ int main()
 		UxsDer3[i] = funcDer3[i] * pow(s, alpha - 1.0) / useful_const::g_alpha;
 	}
 	
-	grunvald_coeffs[0] = pow(-1.0, 0.0) * 1.0;
-	grunvald_coeffs[1] = pow(-1.0, 1.0) * alpha;
-	for (size_t i = 2; i < grunvald_coeffs.size(); ++i)
+	grunvald_coeffs[0] = 1.0;
+	for (size_t i = 1; i < grunvald_coeffs.size(); ++i)
 	{
-		grunvald_coeffs[i] = pow(-1.0, i) * grunvald_coeffs[i - 1] * (alpha - i + 1.0) / i;
+		grunvald_coeffs[i] = grunvald_coeffs[i - 1] * (alpha - i + 1.0) / i;
+	}
+	
+	for(size_t i = 0; i < grunvald_coeffs.size(); ++i)
+	{
+		grunvald_coeffs[i] *= pow(- 1.0, i);
 	}
 	
 	hyper_func.push_back(0);
@@ -320,9 +323,9 @@ int main()
 	{
 		// отступаю с краев по две ячейки, так как производная третьего порядка
 #pragma omp parallel for
-		for(size_t ix = 2; ix < x_steps.size() - 2; ++ix)
+		for(size_t ix = 1; ix < x_steps.size() - 2; ++ix)
 		{
-			const double Vder3 = (V[it][ix+2] - 2.0 * V[it][ix+1] + 2.0 * V[it][ix-1] - V[it][ix-2]) / useful_const::dx3;
+			const double Vder3 = (V[it][ix+2] - 3.0 * V[it][ix+1] + 3.0 * V[it][ix] - V[it][ix-1]) / useful_const::dx3;
 			
 			V[it+1][ix] = - Q1(it, ix) - fracD(it, ix)
 			              - (Uxs[ix] + V[it][ix]) * (Q2(it, ix) + Q3(it, ix) + 0.5 / dx * (fracIn(it, ix + 1) - fracIn(it, ix - 1)))
@@ -334,20 +337,19 @@ int main()
 		}
 		
 		// условия нулевого градиента слева и справа
-		V[it+1][0] = V[it+1][2];
-		V[it+1][1] = V[it+1][2];
+		V[it+1][0] = V[it+1][1];
 		V[it+1][stepAmountX - 1] = V[it+1][stepAmountX - 3];
 		V[it+1][stepAmountX - 2] = V[it+1][stepAmountX - 3];
 	}
 	// -------------------------------------------------------------------------------------------------------------------
 	
 	// Вычисление неявной схемой -----------------------------------------------------------------------------------------
-	for(int i = number_of_explicit_steps; i < time_steps_to_count; ++i)
-	{
-		
-		
-		P3D::P3D_thomas::thomas(A, B, C, D, E, F, X);
-	}
+//	for(int i = number_of_explicit_steps; i < time_steps_to_count; ++i)
+//	{
+//		
+//		
+//		P3D::P3D_thomas::thomas(A, B, C, D, E, F, X);
+//	}
 	// -------------------------------------------------------------------------------------------------------------------
 	
 	// Выполняю обратную подстановку -------------------------------------------------------------------------------------
@@ -355,7 +357,7 @@ int main()
 	{
 		for (size_t p = 0; p < V[l].size(); ++p)
 		{
-			V[l][p] = V[l][p] + Uxs[p];
+//			V[l][p] = V[l][p] + Uxs[p];
 		}
 	}
 	// -------------------------------------------------------------------------------------------------------------------
