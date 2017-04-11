@@ -1,0 +1,4 @@
+SET(LATEX_OUTPUT_PATH ./out)
+INCLUDE(UseLATEX.cmake)
+
+ADD_LATEX_DOCUMENT(main.tex)
